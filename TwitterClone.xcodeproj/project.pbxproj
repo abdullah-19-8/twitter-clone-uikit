@@ -12,6 +12,10 @@
 		878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */; };
 		878FBF002C2C004C00EFD31E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878FBEFF2C2C004C00EFD31E /* Assets.xcassets */; };
 		878FBF032C2C004C00EFD31E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 878FBF022C2C004C00EFD31E /* Base */; };
+		878FBF0D2C2C02E400EFD31E /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBF0C2C2C02E400EFD31E /* HomeViewController.swift */; };
+		878FBF0F2C2C030700EFD31E /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBF0E2C2C030700EFD31E /* SearchViewController.swift */; };
+		878FBF112C2C031D00EFD31E /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBF102C2C031D00EFD31E /* NotificationViewController.swift */; };
+		878FBF132C2C033100EFD31E /* DirectMessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBF122C2C033100EFD31E /* DirectMessagesViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +26,10 @@
 		878FBEFF2C2C004C00EFD31E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		878FBF022C2C004C00EFD31E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		878FBF042C2C004C00EFD31E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		878FBF0C2C2C02E400EFD31E /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		878FBF0E2C2C030700EFD31E /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		878FBF102C2C031D00EFD31E /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
+		878FBF122C2C033100EFD31E /* DirectMessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectMessagesViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,14 +62,34 @@
 		878FBEF52C2C004B00EFD31E /* TwitterClone */ = {
 			isa = PBXGroup;
 			children = (
+				878FBF0A2C2C029700EFD31E /* Controllers */,
 				878FBEF62C2C004B00EFD31E /* AppDelegate.swift */,
 				878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */,
-				878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */,
 				878FBEFF2C2C004C00EFD31E /* Assets.xcassets */,
 				878FBF012C2C004C00EFD31E /* LaunchScreen.storyboard */,
 				878FBF042C2C004C00EFD31E /* Info.plist */,
 			);
 			path = TwitterClone;
+			sourceTree = "<group>";
+		};
+		878FBF0A2C2C029700EFD31E /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				878FBF0B2C2C02A100EFD31E /* Core */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		878FBF0B2C2C02A100EFD31E /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */,
+				878FBF0C2C2C02E400EFD31E /* HomeViewController.swift */,
+				878FBF0E2C2C030700EFD31E /* SearchViewController.swift */,
+				878FBF102C2C031D00EFD31E /* NotificationViewController.swift */,
+				878FBF122C2C033100EFD31E /* DirectMessagesViewController.swift */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,9 +162,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				878FBF0F2C2C030700EFD31E /* SearchViewController.swift in Sources */,
 				878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */,
+				878FBF112C2C031D00EFD31E /* NotificationViewController.swift in Sources */,
 				878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */,
 				878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */,
+				878FBF0D2C2C02E400EFD31E /* HomeViewController.swift in Sources */,
+				878FBF132C2C033100EFD31E /* DirectMessagesViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
