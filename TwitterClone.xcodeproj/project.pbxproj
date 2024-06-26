@@ -9,8 +9,7 @@
 /* Begin PBXBuildFile section */
 		878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEF62C2C004B00EFD31E /* AppDelegate.swift */; };
 		878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */; };
-		878FBEFB2C2C004B00EFD31E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEFA2C2C004B00EFD31E /* ViewController.swift */; };
-		878FBEFE2C2C004B00EFD31E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 878FBEFD2C2C004B00EFD31E /* Base */; };
+		878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */; };
 		878FBF002C2C004C00EFD31E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878FBEFF2C2C004C00EFD31E /* Assets.xcassets */; };
 		878FBF032C2C004C00EFD31E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 878FBF022C2C004C00EFD31E /* Base */; };
 /* End PBXBuildFile section */
@@ -19,8 +18,7 @@
 		878FBEF32C2C004B00EFD31E /* TwitterClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwitterClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		878FBEF62C2C004B00EFD31E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		878FBEFA2C2C004B00EFD31E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		878FBEFD2C2C004B00EFD31E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewController.swift; sourceTree = "<group>"; };
 		878FBEFF2C2C004C00EFD31E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		878FBF022C2C004C00EFD31E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		878FBF042C2C004C00EFD31E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -58,8 +56,7 @@
 			children = (
 				878FBEF62C2C004B00EFD31E /* AppDelegate.swift */,
 				878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */,
-				878FBEFA2C2C004B00EFD31E /* ViewController.swift */,
-				878FBEFC2C2C004B00EFD31E /* Main.storyboard */,
+				878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */,
 				878FBEFF2C2C004C00EFD31E /* Assets.xcassets */,
 				878FBF012C2C004C00EFD31E /* LaunchScreen.storyboard */,
 				878FBF042C2C004C00EFD31E /* Info.plist */,
@@ -127,7 +124,6 @@
 			files = (
 				878FBF002C2C004C00EFD31E /* Assets.xcassets in Resources */,
 				878FBF032C2C004C00EFD31E /* Base in Resources */,
-				878FBEFE2C2C004B00EFD31E /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,7 +134,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				878FBEFB2C2C004B00EFD31E /* ViewController.swift in Sources */,
+				878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */,
 				878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */,
 				878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */,
 			);
@@ -147,14 +143,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		878FBEFC2C2C004B00EFD31E /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				878FBEFD2C2C004B00EFD31E /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		878FBF012C2C004C00EFD31E /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -294,11 +282,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TwitterClone/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Twitter;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -306,9 +294,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = abdullah.TwitterClone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -321,11 +313,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TwitterClone/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Twitter;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -333,9 +325,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = abdullah.TwitterClone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
