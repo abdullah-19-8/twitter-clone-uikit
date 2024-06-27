@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		870C4B652C2DD3640062EE18 /* TweetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 870C4B642C2DD3640062EE18 /* TweetTableViewCell.swift */; };
 		878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEF62C2C004B00EFD31E /* AppDelegate.swift */; };
 		878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */; };
 		878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		870C4B642C2DD3640062EE18 /* TweetTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetTableViewCell.swift; sourceTree = "<group>"; };
 		878FBEF32C2C004B00EFD31E /* TwitterClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwitterClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		878FBEF62C2C004B00EFD31E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -43,6 +45,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		870C4B632C2DD3450062EE18 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				870C4B642C2DD3640062EE18 /* TweetTableViewCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		878FBEEA2C2C004B00EFD31E = {
 			isa = PBXGroup;
 			children = (
@@ -62,6 +72,7 @@
 		878FBEF52C2C004B00EFD31E /* TwitterClone */ = {
 			isa = PBXGroup;
 			children = (
+				870C4B632C2DD3450062EE18 /* Views */,
 				878FBF0A2C2C029700EFD31E /* Controllers */,
 				878FBEF62C2C004B00EFD31E /* AppDelegate.swift */,
 				878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */,
@@ -169,6 +180,7 @@
 				878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */,
 				878FBF0D2C2C02E400EFD31E /* HomeViewController.swift in Sources */,
 				878FBF132C2C033100EFD31E /* DirectMessagesViewController.swift in Sources */,
+				870C4B652C2DD3640062EE18 /* TweetTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
