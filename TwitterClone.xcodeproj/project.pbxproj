@@ -18,6 +18,7 @@
 		878FBF112C2C031D00EFD31E /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBF102C2C031D00EFD31E /* NotificationViewController.swift */; };
 		878FBF132C2C033100EFD31E /* DirectMessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBF122C2C033100EFD31E /* DirectMessagesViewController.swift */; };
 		87A3ACDE2C31C39600B87274 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3ACDD2C31C39600B87274 /* ProfileViewController.swift */; };
+		87A3ACE02C32686B00B87274 /* ProfileTableViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		878FBF102C2C031D00EFD31E /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
 		878FBF122C2C033100EFD31E /* DirectMessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectMessagesViewController.swift; sourceTree = "<group>"; };
 		87A3ACDD2C31C39600B87274 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewHeader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				870C4B642C2DD3640062EE18 /* TweetTableViewCell.swift */,
+				87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 				878FBF0D2C2C02E400EFD31E /* HomeViewController.swift in Sources */,
 				87A3ACDE2C31C39600B87274 /* ProfileViewController.swift in Sources */,
 				878FBF132C2C033100EFD31E /* DirectMessagesViewController.swift in Sources */,
+				87A3ACE02C32686B00B87274 /* ProfileTableViewHeader.swift in Sources */,
 				870C4B652C2DD3640062EE18 /* TweetTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
