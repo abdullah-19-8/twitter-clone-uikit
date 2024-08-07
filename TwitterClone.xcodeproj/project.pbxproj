@@ -26,6 +26,7 @@
 		87C89EF22C63DA3400F666E9 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF12C63DA3400F666E9 /* FirebaseDatabase */; };
 		87C89EF42C63DA3D00F666E9 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF32C63DA3D00F666E9 /* FirebaseFirestore */; };
 		87C89EF62C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF52C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community */; };
+		87C89EFA2C63E26A00F666E9 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewHeader.swift; sourceTree = "<group>"; };
 		87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		87C89EE92C63D89800F666E9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */,
+				87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -233,6 +236,7 @@
 				878FBF0F2C2C030700EFD31E /* SearchViewController.swift in Sources */,
 				878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */,
 				878FBF112C2C031D00EFD31E /* NotificationViewController.swift in Sources */,
+				87C89EFA2C63E26A00F666E9 /* RegisterViewController.swift in Sources */,
 				878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */,
 				878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */,
 				878FBF0D2C2C02E400EFD31E /* HomeViewController.swift in Sources */,
