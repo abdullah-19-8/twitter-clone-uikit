@@ -82,6 +82,11 @@ class RegisterViewController: UIViewController {
             self?.registerButton.isEnabled = validationState
         }
         .store(in: &subscription)
+        
+        viewModel.$user.sink { [weak self] user in
+            print(user)
+        }
+        .store(in: &subscription)
     }
     
     @objc private func didTapToDismess() {
@@ -99,6 +104,7 @@ class RegisterViewController: UIViewController {
         view.addSubview(emailTextField)
         view.addSubview(passwordTextField)
         view.addSubview(registerButton)
+        registerButton.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
         
         print(registerButton.isEnabled)
         
@@ -108,6 +114,9 @@ class RegisterViewController: UIViewController {
         bindView()
     }
     
+    @objc private func didTapRegister() {
+        viewModel.createUser()
+    }
     private func configureConstraints() {
         
         let registerTitleLabelConstraints = [
