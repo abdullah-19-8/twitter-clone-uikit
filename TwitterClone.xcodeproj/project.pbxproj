@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		870C4B652C2DD3640062EE18 /* TweetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 870C4B642C2DD3640062EE18 /* TweetTableViewCell.swift */; };
 		8757207C2C64737F000F256E /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8757207B2C64737F000F256E /* AuthManager.swift */; };
+		8757207E2C654728000F256E /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8757207D2C654728000F256E /* LoginViewController.swift */; };
 		878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEF62C2C004B00EFD31E /* AppDelegate.swift */; };
 		878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */; };
 		878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878FBEFA2C2C004B00EFD31E /* MainTabBarViewController.swift */; };
@@ -28,12 +29,13 @@
 		87C89EF42C63DA3D00F666E9 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF32C63DA3D00F666E9 /* FirebaseFirestore */; };
 		87C89EF62C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF52C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community */; };
 		87C89EFA2C63E26A00F666E9 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */; };
-		87C89EFD2C63EC7D00F666E9 /* RegisterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EFC2C63EC7D00F666E9 /* RegisterViewModel.swift */; };
+		87C89EFD2C63EC7D00F666E9 /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EFC2C63EC7D00F666E9 /* AuthenticationViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		870C4B642C2DD3640062EE18 /* TweetTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetTableViewCell.swift; sourceTree = "<group>"; };
 		8757207B2C64737F000F256E /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		8757207D2C654728000F256E /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		878FBEF32C2C004B00EFD31E /* TwitterClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwitterClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		878FBEF62C2C004B00EFD31E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		878FBEF82C2C004B00EFD31E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -50,7 +52,7 @@
 		87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		87C89EE92C63D89800F666E9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
-		87C89EFC2C63EC7D00F666E9 /* RegisterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewModel.swift; sourceTree = "<group>"; };
+		87C89EFC2C63EC7D00F666E9 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +157,7 @@
 			children = (
 				87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */,
 				87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */,
+				8757207D2C654728000F256E /* LoginViewController.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -169,7 +172,7 @@
 		87C89EFB2C63EC4300F666E9 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				87C89EFC2C63EC7D00F666E9 /* RegisterViewModel.swift */,
+				87C89EFC2C63EC7D00F666E9 /* AuthenticationViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -258,13 +261,14 @@
 				878FBF0F2C2C030700EFD31E /* SearchViewController.swift in Sources */,
 				8757207C2C64737F000F256E /* AuthManager.swift in Sources */,
 				878FBEFB2C2C004B00EFD31E /* MainTabBarViewController.swift in Sources */,
+				8757207E2C654728000F256E /* LoginViewController.swift in Sources */,
 				878FBF112C2C031D00EFD31E /* NotificationViewController.swift in Sources */,
 				87C89EFA2C63E26A00F666E9 /* RegisterViewController.swift in Sources */,
 				878FBEF72C2C004B00EFD31E /* AppDelegate.swift in Sources */,
 				878FBEF92C2C004B00EFD31E /* SceneDelegate.swift in Sources */,
 				878FBF0D2C2C02E400EFD31E /* HomeViewController.swift in Sources */,
 				87A3ACDE2C31C39600B87274 /* ProfileViewController.swift in Sources */,
-				87C89EFD2C63EC7D00F666E9 /* RegisterViewModel.swift in Sources */,
+				87C89EFD2C63EC7D00F666E9 /* AuthenticationViewModel.swift in Sources */,
 				878FBF132C2C033100EFD31E /* DirectMessagesViewController.swift in Sources */,
 				87A3ACE02C32686B00B87274 /* ProfileTableViewHeader.swift in Sources */,
 				87C89EE82C63D68A00F666E9 /* OnboardingViewController.swift in Sources */,

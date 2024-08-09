@@ -35,6 +35,11 @@ class HomeViewController: UIViewController {
         tableView.register(TweetTableViewCell.self, forCellReuseIdentifier: TweetTableViewCell.identifier)
         return tableView
     }()
+    
+    @objc private func didTapSignOut() {
+        try? Auth.auth().signOut()
+        handleAuthentication()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,6 +48,7 @@ class HomeViewController: UIViewController {
         timelineTableView.delegate = self
         timelineTableView.dataSource = self
         configureNavigationBar()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), style: .plain, target: self, action: #selector(didTapSignOut))
     }
     
     override func viewDidLayoutSubviews() {
@@ -50,15 +56,19 @@ class HomeViewController: UIViewController {
         timelineTableView.frame = view.frame
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.navigationBar.isHidden = false
-        
+    private func handleAuthentication() {
         if Auth.auth().currentUser == nil {
             let vc = UINavigationController(rootViewController: OnboardingViewController())
             vc.modalPresentationStyle = .fullScreen
             present(vc, animated: true)
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = false
+        
+        handleAuthentication()
     }
 }
 
