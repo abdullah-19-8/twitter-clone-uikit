@@ -10,7 +10,7 @@ import FirebaseAuth
 
 struct TwitterUser: Codable {
     let id: String
-    let diplayName: String = ""
+    let displayName: String = ""
     let username: String = ""
     let followersCount: Int = 0
     let followingCount: Int = 0
