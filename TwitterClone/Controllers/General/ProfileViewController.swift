@@ -14,7 +14,16 @@ class ProfileViewController: UIViewController {
     private var subscriptions: Set<AnyCancellable> = []
     
     private var isStatusBarHidden: Bool = true
-    private var viewModel = ProfileViewModel()
+    private var viewModel: ProfileViewModel
+    
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private let statusBar: UIView = {
         let view = UIView()
@@ -33,7 +42,7 @@ class ProfileViewController: UIViewController {
         
     }()
     
-    private lazy var headerView = ProfileTableViewHeader(frame: CGRect(x: 0, y: 0, width: profileTableView.frame.width, height: 380))
+    private lazy var headerView = ProfileTableViewHeader(frame: CGRect(x: 0, y: 0, width: profileTableView.frame.width, height: 390))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,14 +58,17 @@ class ProfileViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         configureConstraints()
         bindViews()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         viewModel.retreiveUser()
     }
     
     private func bindViews() {
+        viewModel.$tweets.sink { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.profileTableView.reloadData()
+            }
+        }
+        .store(in: &subscriptions)
+        
         viewModel.$user.sink { [weak self] user in
             guard let user else { return }
             self?.headerView.displayNameLabel.text = user.displayName
@@ -93,13 +105,19 @@ class ProfileViewController: UIViewController {
 
 extension ProfileViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return viewModel.tweets.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TweetTableViewCell.identifier, for: indexPath) as? TweetTableViewCell else {
             return UITableViewCell()
         }
+        let tweet = viewModel.tweets[indexPath.row]
+        
+        cell.configureTweet(with: tweet.author.displayName,
+                            username: tweet.author.username,
+                            tweetTextContent: tweet.tweetContent,
+                            avatarPath: tweet.author.avatarPath)
         return cell
     }
     

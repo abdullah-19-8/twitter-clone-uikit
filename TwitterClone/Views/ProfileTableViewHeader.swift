@@ -303,7 +303,7 @@ class ProfileTableViewHeader: UIView {
         let indicatorConstraints = [
             leadingAnchors[0],
             trailingAnchors[0],
-            indicator.topAnchor.constraint(equalTo: sectionStack.arrangedSubviews[0].bottomAnchor),
+            indicator.topAnchor.constraint(equalTo: sectionStack.bottomAnchor, constant: -4),
             indicator.heightAnchor.constraint(equalToConstant: 4)
         ]
         

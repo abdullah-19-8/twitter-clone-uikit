@@ -45,7 +45,8 @@ class HomeViewController: UIViewController {
     }
     
     @objc private func didTapProfile(){
-        let vc = ProfileViewController()
+        let viewModel = ProfileViewModel()
+        let vc = ProfileViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -148,12 +149,12 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let tweetModel = viewModel.tweets[indexPath.row]
+        let tweet = viewModel.tweets[indexPath.row]
         
-        cell.configureTweet(with: tweetModel.author.displayName,
-                            username: tweetModel.author.username,
-                            tweetTextContent: tweetModel.tweetContent,
-                            avatarPath: tweetModel.author.avatarPath)
+        cell.configureTweet(with: tweet.author.displayName,
+                            username: tweet.author.username,
+                            tweetTextContent: tweet.tweetContent,
+                            avatarPath: tweet.author.avatarPath)
         
         cell.delegate = self
         return cell
