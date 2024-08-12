@@ -99,9 +99,9 @@ class ProfileDataFormViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Submit", for: .normal)
         button.tintColor = .white
-        button.setTitleColor(UIColor(red: 225/255, green: 225/255, blue: 228/255, alpha: 1), for: .disabled)
+        button.setTitleColor(.white.withAlphaComponent(0.7), for: .disabled)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-        button.backgroundColor = UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1)
+        button.backgroundColor = .twitterBlueColor
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 25
         button.isEnabled = false
