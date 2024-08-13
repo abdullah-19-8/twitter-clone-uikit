@@ -47,6 +47,7 @@
 		87C89EF62C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF52C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community */; };
 		87C89EFA2C63E26A00F666E9 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */; };
 		87C89EFD2C63EC7D00F666E9 /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EFC2C63EC7D00F666E9 /* AuthenticationViewModel.swift */; };
+		87F7EF912C6B5F6C00C27D3C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 87F7EF902C6B5F6C00C27D3C /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -91,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				87F7EF912C6B5F6C00C27D3C /* FirebaseMessaging in Frameworks */,
 				87C89EF22C63DA3400F666E9 /* FirebaseDatabase in Frameworks */,
 				879960722C689199001CBBE6 /* FirebaseStorageCombine-Community in Frameworks */,
 				879960772C68A565001CBBE6 /* SDWebImage in Frameworks */,
@@ -274,6 +276,7 @@
 				8799606F2C689192001CBBE6 /* FirebaseStorage */,
 				879960712C689199001CBBE6 /* FirebaseStorageCombine-Community */,
 				879960762C68A565001CBBE6 /* SDWebImage */,
+				87F7EF902C6B5F6C00C27D3C /* FirebaseMessaging */,
 			);
 			productName = TwitterClone;
 			productReference = 878FBEF32C2C004B00EFD31E /* TwitterClone.app */;
@@ -647,6 +650,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 87C89EEB2C63DA1400F666E9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = "FirebaseFirestoreCombine-Community";
+		};
+		87F7EF902C6B5F6C00C27D3C /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 87C89EEB2C63DA1400F666E9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

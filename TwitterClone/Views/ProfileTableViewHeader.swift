@@ -6,8 +6,12 @@
 //
 
 import UIKit
+import Combine
 
 class ProfileTableViewHeader: UIView {
+    
+    private var currentFollowState: ProfileFollowingState = .personal
+    var followButtonActionPublisher: PassthroughSubject<ProfileFollowingState, Never> = PassthroughSubject()
     
     private enum SectionTabs: String {
         case tweets = "Tweets"
@@ -199,7 +203,15 @@ class ProfileTableViewHeader: UIView {
         
         configureConstraints()
         configureStackButton()
-        configureFollow()
+        configureFollowButtonAction()
+    }
+    
+    private func configureFollowButtonAction() {
+        followButton.addTarget(self, action: #selector(didTapFollowButton), for: .touchUpInside)
+    }
+    
+    @objc private func didTapFollowButton() {
+        followButtonActionPublisher.send(currentFollowState)
     }
     
     private func configureStackButton() {
@@ -216,18 +228,27 @@ class ProfileTableViewHeader: UIView {
         }
     }
     
-    private func configureAsUnFollow() {
+    func configureAsUnFollow() {
         followButton.setTitle("Unfollow", for: .normal)
         followButton.backgroundColor = .systemBackground
         followButton.layer.borderWidth = 2
         followButton.layer.borderColor = UIColor.twitterBlueColor.cgColor
+        followButton.isHidden = false
+        currentFollowState = .userIsFollowed
     }
     
-    private func configureFollow() {
+    func configureFollow() {
         followButton.setTitle("Follow", for: .normal)
         followButton.backgroundColor = .twitterBlueColor
         followButton.setTitleColor(.white, for: .normal)
         followButton.layer.borderColor = UIColor.clear.cgColor
+        followButton.isHidden = false
+        currentFollowState = .userIsUnFollowed
+    }
+    
+    func configureAsPersonal() {
+        followButton.isHidden = true
+        currentFollowState = .personal
     }
     
     @objc private func didTapTab(_ sender: UIButton) {
