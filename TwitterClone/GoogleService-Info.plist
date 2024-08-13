@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.abdullah.TwitterClone</string>
+	<string>com.rahen.finance</string>
 	<key>PROJECT_ID</key>
 	<string>twitterproject-6d817</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:662052282003:ios:b2634e3c9120953bf87766</string>
+	<string>1:662052282003:ios:3ae6d87baddc648df87766</string>
 </dict>
 </plist>

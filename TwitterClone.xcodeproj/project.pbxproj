@@ -39,7 +39,6 @@
 		87A3ACDE2C31C39600B87274 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3ACDD2C31C39600B87274 /* ProfileViewController.swift */; };
 		87A3ACE02C32686B00B87274 /* ProfileTableViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */; };
 		87C89EE82C63D68A00F666E9 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */; };
-		87C89EEA2C63D89800F666E9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 87C89EE92C63D89800F666E9 /* GoogleService-Info.plist */; };
 		87C89EEE2C63DA2C00F666E9 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EED2C63DA2C00F666E9 /* FirebaseAuth */; };
 		87C89EF02C63DA2C00F666E9 /* FirebaseAuthCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EEF2C63DA2C00F666E9 /* FirebaseAuthCombine-Community */; };
 		87C89EF22C63DA3400F666E9 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 87C89EF12C63DA3400F666E9 /* FirebaseDatabase */; };
@@ -48,6 +47,7 @@
 		87C89EFA2C63E26A00F666E9 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */; };
 		87C89EFD2C63EC7D00F666E9 /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EFC2C63EC7D00F666E9 /* AuthenticationViewModel.swift */; };
 		87F7EF912C6B5F6C00C27D3C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 87F7EF902C6B5F6C00C27D3C /* FirebaseMessaging */; };
+		87F7EF932C6B621100C27D3C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 87F7EF922C6B621100C27D3C /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,9 +82,10 @@
 		87A3ACDD2C31C39600B87274 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewHeader.swift; sourceTree = "<group>"; };
 		87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
-		87C89EE92C63D89800F666E9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		87C89EF92C63E26A00F666E9 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		87C89EFC2C63EC7D00F666E9 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
+		87F7EF922C6B621100C27D3C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		87F7EF942C6B624700C27D3C /* TwitterClone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TwitterClone.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +148,7 @@
 		878FBEF52C2C004B00EFD31E /* TwitterClone */ = {
 			isa = PBXGroup;
 			children = (
+				87F7EF942C6B624700C27D3C /* TwitterClone.entitlements */,
 				879960782C69B5B5001CBBE6 /* Utils */,
 				879960622C65F391001CBBE6 /* Models */,
 				8757207A2C647356000F256E /* Networking */,
@@ -158,7 +160,7 @@
 				878FBEFF2C2C004C00EFD31E /* Assets.xcassets */,
 				878FBF012C2C004C00EFD31E /* LaunchScreen.storyboard */,
 				878FBF042C2C004C00EFD31E /* Info.plist */,
-				87C89EE92C63D89800F666E9 /* GoogleService-Info.plist */,
+				87F7EF922C6B621100C27D3C /* GoogleService-Info.plist */,
 			);
 			path = TwitterClone;
 			sourceTree = "<group>";
@@ -326,7 +328,7 @@
 			files = (
 				878FBF002C2C004C00EFD31E /* Assets.xcassets in Resources */,
 				878FBF032C2C004C00EFD31E /* Base in Resources */,
-				87C89EEA2C63D89800F666E9 /* GoogleService-Info.plist in Resources */,
+				87F7EF932C6B621100C27D3C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,9 +509,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = TwitterClone/TwitterClone.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LY3VRY9S98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TwitterClone/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Twitter;
@@ -522,7 +526,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.abdullah.TwitterClone;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rahen.finance;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -540,9 +544,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = TwitterClone/TwitterClone.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LY3VRY9S98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TwitterClone/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Twitter;
@@ -555,7 +561,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.abdullah.TwitterClone;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rahen.finance;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
