@@ -199,7 +199,7 @@ class ProfileTableViewHeader: UIView {
         
         configureConstraints()
         configureStackButton()
-        configureButtonAsUnFollowed()
+        configureFollow()
     }
     
     private func configureStackButton() {
@@ -216,14 +216,14 @@ class ProfileTableViewHeader: UIView {
         }
     }
     
-    private func configureButtonAsFollowed() {
+    private func configureAsUnFollow() {
         followButton.setTitle("Unfollow", for: .normal)
         followButton.backgroundColor = .systemBackground
         followButton.layer.borderWidth = 2
         followButton.layer.borderColor = UIColor.twitterBlueColor.cgColor
     }
     
-    private func configureButtonAsUnFollowed() {
+    private func configureFollow() {
         followButton.setTitle("Follow", for: .normal)
         followButton.backgroundColor = .twitterBlueColor
         followButton.setTitleColor(.white, for: .normal)

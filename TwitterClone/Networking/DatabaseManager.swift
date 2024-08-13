@@ -59,4 +59,16 @@ class DatabaseManager {
             })
             .eraseToAnyPublisher()
     }
+    
+    func collectionUsers(search query: String) -> AnyPublisher<[TwitterUser], Error> {
+        db.collection(usersPath).whereField("username", isEqualTo: query)
+            .getDocuments()
+            .map(\.documents)
+            .tryMap { snapshots in
+                try snapshots.map({
+                    try $0.data(as: TwitterUser.self)
+                })
+            }
+            .eraseToAnyPublisher()
+    }
 }

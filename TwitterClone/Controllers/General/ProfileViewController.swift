@@ -58,7 +58,7 @@ class ProfileViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         configureConstraints()
         bindViews()
-        viewModel.retreiveUser()
+        viewModel.fetchUserTweets()
     }
     
     private func bindViews() {
@@ -70,7 +70,6 @@ class ProfileViewController: UIViewController {
         .store(in: &subscriptions)
         
         viewModel.$user.sink { [weak self] user in
-            guard let user else { return }
             self?.headerView.displayNameLabel.text = user.displayName
             self?.headerView.usernameLabel.text = "@\(user.username)"
             self?.headerView.userBioLabel.text = user.bio
