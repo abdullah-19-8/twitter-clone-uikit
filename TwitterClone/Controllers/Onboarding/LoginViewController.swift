@@ -6,25 +6,23 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import RxCocoa
 
 class LoginViewController: UIViewController {
     
-    private var viewModel = AuthenticationViewModel()
-    private var subscription: Set<AnyCancellable> = []
+    private let viewModel = AuthenticationViewModel()
+    private let disposeBag = DisposeBag()
     
     private let loginTitleLabel: UILabel = {
-        
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Login to your account"
         label.font = .systemFont(ofSize: 32, weight: .bold)
-        
         return label
     }()
     
     private let emailTextField: UITextField = {
-        
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.keyboardType = .emailAddress
@@ -32,12 +30,10 @@ class LoginViewController: UIViewController {
             string: "Email",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
         )
-        
         return textField
     }()
     
     private let passwordTextField: UITextField = {
-        
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(
@@ -45,12 +41,10 @@ class LoginViewController: UIViewController {
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
         )
         textField.isSecureTextEntry = true
-        
         return textField
     }()
     
     private let loginButton: UIButton = {
-        
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Login", for: .normal)
@@ -61,40 +55,37 @@ class LoginViewController: UIViewController {
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 25
         button.isEnabled = false
-        
         return button
     }()
     
-    @objc private func didChangeEmailField() {
-        viewModel.email = emailTextField.text
-        viewModel.validateRegistrationForm()
-    }
-    
-    @objc private func didChangePasswordField() {
-        viewModel.password = passwordTextField.text
-        viewModel.validateRegistrationForm()
-    }
-    
     private func bindView() {
-        emailTextField.addTarget(self, action: #selector(didChangeEmailField), for: .editingChanged)
-        passwordTextField.addTarget(self, action: #selector(didChangePasswordField), for: .editingChanged)
-        viewModel.$isAuthenticationFormValid.sink { [weak self] validationState in
-            self?.loginButton.isEnabled = validationState
-        }
-        .store(in: &subscription)
+        let emailObservable = emailTextField.rx.text.orEmpty.asObservable()
+        let passwordObservable = passwordTextField.rx.text.orEmpty.asObservable()
         
-        viewModel.$user.sink { [weak self] user in
-            guard user != nil else { return }
-            guard let vc = self?.navigationController?.viewControllers.first as? OnboardingViewController else { return }
-            vc.dismiss(animated: true)
-        }
-        .store(in: &subscription)
+        Observable.combineLatest(emailObservable, passwordObservable)
+            .bind { [weak self] email, password in
+                self?.viewModel.email.accept(email)
+                self?.viewModel.password.accept(password)
+            }
+            .disposed(by: disposeBag)
         
-        viewModel.$error.sink { [weak self] error in
-            guard let error else { return }
-            self?.presentAlert(with: error)
-        }
-        .store(in: &subscription)
+        viewModel.isAuthenticationFormValid
+            .bind(to: loginButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        viewModel.user
+            .compactMap { $0 }
+            .subscribe(onNext: { [weak self] _ in
+                guard let vc = self?.navigationController?.viewControllers.first as? OnboardingViewController else { return }
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.error
+            .subscribe(onNext: { [weak self] error in
+                self?.presentAlert(with: error ?? "Error")
+            })
+            .disposed(by: disposeBag)
     }
     
     private func presentAlert(with error: String) {
@@ -104,7 +95,7 @@ class LoginViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    @objc private func didTapToDismess() {
+    @objc private func didTapToDismiss() {
         view.endEditing(true)
     }
     
@@ -123,12 +114,9 @@ class LoginViewController: UIViewController {
         
         configureConstraints()
         bindView()
-        
     }
     
-    
     private func configureConstraints() {
-        
         let loginTitleLabelConstraints = [
             loginTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loginTitleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -162,6 +150,4 @@ class LoginViewController: UIViewController {
         NSLayoutConstraint.activate(passwordTextFieldConstraints)
         NSLayoutConstraint.activate(loginButtonConstraints)
     }
-    
-    
 }

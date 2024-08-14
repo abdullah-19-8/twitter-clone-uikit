@@ -6,12 +6,13 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import RxCocoa
 import SDWebImage
 
 class ProfileViewController: UIViewController {
-    
-    private var subscriptions: Set<AnyCancellable> = []
+
+    private let disposeBag = DisposeBag()
     
     private var isStatusBarHidden: Bool = true
     private var viewModel: ProfileViewModel
@@ -34,12 +35,10 @@ class ProfileViewController: UIViewController {
     }()
     
     private let profileTableView: UITableView = {
-        
         let tableView = UITableView()
         tableView.register(TweetTableViewCell.self, forCellReuseIdentifier: TweetTableViewCell.identifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
-        
     }()
     
     private lazy var headerView = ProfileTableViewHeader(frame: CGRect(x: 0, y: 0, width: profileTableView.frame.width, height: 390))
@@ -51,8 +50,8 @@ class ProfileViewController: UIViewController {
         navigationItem.title = "Profile"
         view.addSubview(profileTableView)
         view.addSubview(statusBar)
-        profileTableView.delegate = self
-        profileTableView.dataSource = self
+        profileTableView.delegate = nil
+        profileTableView.dataSource = nil
         profileTableView.tableHeaderView = headerView
         profileTableView.contentInsetAdjustmentBehavior = .never
         navigationController?.navigationBar.isHidden = true
@@ -62,27 +61,51 @@ class ProfileViewController: UIViewController {
     }
     
     private func bindViews() {
-        viewModel.$tweets.sink { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.profileTableView.reloadData()
+        // Bind tweets to table view
+        viewModel.tweets
+            .bind(to: profileTableView.rx.items(cellIdentifier: TweetTableViewCell.identifier, cellType: TweetTableViewCell.self)) { [weak self] row, tweet, cell in
+                cell.configureTweet(with: tweet.author.displayName,
+                                    username: tweet.author.username,
+                                    tweetTextContent: tweet.tweetContent,
+                                    avatarPath: tweet.author.avatarPath)
             }
-        }
-        .store(in: &subscriptions)
+            .disposed(by: disposeBag)
         
-        viewModel.$user.sink { [weak self] user in
-            self?.headerView.displayNameLabel.text = user.displayName
-            self?.headerView.usernameLabel.text = "@\(user.username)"
-            self?.headerView.userBioLabel.text = user.bio
-            self?.headerView.followingCountLabel.text = String(user.followingCount)
-            self?.headerView.followersCountLabel.text = String(user.followersCount)
-            self?.headerView.profileAvatarImageView.sd_setImage(with: URL(string: user.avatarPath))
-            self?.headerView.joinDateLabel.text = "Joined \(self?.viewModel.getFormattedDate(with: user.createdOn) ?? "")"
-        }
-        .store(in: &subscriptions)
+        // Bind user info to header view
+        viewModel.user
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] user in
+                self?.headerView.displayNameLabel.text = user.displayName
+                self?.headerView.usernameLabel.text = "@\(user.username)"
+                self?.headerView.userBioLabel.text = user.bio
+                self?.headerView.followingCountLabel.text = String(user.followingCount)
+                self?.headerView.followersCountLabel.text = String(user.followersCount)
+                self?.headerView.profileAvatarImageView.sd_setImage(with: URL(string: user.avatarPath))
+                self?.headerView.joinDateLabel.text = "Joined \(self?.viewModel.getFormattedDate(with: user.createdOn) ?? "")"
+            })
+            .disposed(by: disposeBag)
+        
+        // Handle scroll view to toggle status bar visibility
+        profileTableView.rx.contentOffset
+            .map { $0.y }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] yPosition in
+                if yPosition > 150 && self?.isStatusBarHidden == true {
+                    self?.isStatusBarHidden = false
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveLinear) { [weak self] in
+                        self?.statusBar.layer.opacity = 1
+                    }
+                } else if yPosition < 0 && self?.isStatusBarHidden == false {
+                    self?.isStatusBarHidden = true
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveLinear) { [weak self] in
+                        self?.statusBar.layer.opacity = 0
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     private func configureConstraints() {
-        
         let profileTableViewConstraints = [
             profileTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             profileTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -104,35 +127,19 @@ class ProfileViewController: UIViewController {
 
 extension ProfileViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.tweets.count
+        return viewModel.tweets.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TweetTableViewCell.identifier, for: indexPath) as? TweetTableViewCell else {
             return UITableViewCell()
         }
-        let tweet = viewModel.tweets[indexPath.row]
+        let tweet = viewModel.tweets.value[indexPath.row]
         
         cell.configureTweet(with: tweet.author.displayName,
                             username: tweet.author.username,
                             tweetTextContent: tweet.tweetContent,
                             avatarPath: tweet.author.avatarPath)
         return cell
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let yPosition = scrollView.contentOffset.y
-        
-        if yPosition > 150 && isStatusBarHidden {
-            isStatusBarHidden = false
-            UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveLinear) { [weak self] in
-                self?.statusBar.layer.opacity = 1
-            }
-        } else if yPosition < 0 && !isStatusBarHidden {
-            isStatusBarHidden = true
-            UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveLinear) { [weak self] in
-                self?.statusBar.layer.opacity = 0
-            }
-        }
     }
 }

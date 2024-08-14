@@ -36,6 +36,10 @@
 		879960832C6A516B001CBBE6 /* SearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879960822C6A516B001CBBE6 /* SearchResultsViewController.swift */; };
 		879960852C6A57B2001CBBE6 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879960842C6A57B2001CBBE6 /* SearchViewModel.swift */; };
 		879960872C6A5AD5001CBBE6 /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879960862C6A5AD5001CBBE6 /* UserTableViewCell.swift */; };
+		879FCE9C2C6C4B3600FF2316 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 879FCE9B2C6C4B3600FF2316 /* RxCocoa */; };
+		879FCE9E2C6C4B3600FF2316 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 879FCE9D2C6C4B3600FF2316 /* RxSwift */; };
+		879FCEA12C6C60A200FF2316 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 879FCEA02C6C60A200FF2316 /* RxGesture */; };
+		879FCEA32C6C674400FF2316 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 879FCEA22C6C674400FF2316 /* RxRelay */; };
 		87A3ACDE2C31C39600B87274 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3ACDD2C31C39600B87274 /* ProfileViewController.swift */; };
 		87A3ACE02C32686B00B87274 /* ProfileTableViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3ACDF2C32686B00B87274 /* ProfileTableViewHeader.swift */; };
 		87C89EE82C63D68A00F666E9 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C89EE72C63D68A00F666E9 /* OnboardingViewController.swift */; };
@@ -95,13 +99,17 @@
 			files = (
 				87F7EF912C6B5F6C00C27D3C /* FirebaseMessaging in Frameworks */,
 				87C89EF22C63DA3400F666E9 /* FirebaseDatabase in Frameworks */,
+				879FCE9C2C6C4B3600FF2316 /* RxCocoa in Frameworks */,
 				879960722C689199001CBBE6 /* FirebaseStorageCombine-Community in Frameworks */,
 				879960772C68A565001CBBE6 /* SDWebImage in Frameworks */,
 				87C89EF42C63DA3D00F666E9 /* FirebaseFirestore in Frameworks */,
 				87C89EEE2C63DA2C00F666E9 /* FirebaseAuth in Frameworks */,
 				87C89EF62C63DA3D00F666E9 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				87C89EF02C63DA2C00F666E9 /* FirebaseAuthCombine-Community in Frameworks */,
+				879FCEA32C6C674400FF2316 /* RxRelay in Frameworks */,
 				879960702C689192001CBBE6 /* FirebaseStorage in Frameworks */,
+				879FCEA12C6C60A200FF2316 /* RxGesture in Frameworks */,
+				879FCE9E2C6C4B3600FF2316 /* RxSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,6 +287,10 @@
 				879960712C689199001CBBE6 /* FirebaseStorageCombine-Community */,
 				879960762C68A565001CBBE6 /* SDWebImage */,
 				87F7EF902C6B5F6C00C27D3C /* FirebaseMessaging */,
+				879FCE9B2C6C4B3600FF2316 /* RxCocoa */,
+				879FCE9D2C6C4B3600FF2316 /* RxSwift */,
+				879FCEA02C6C60A200FF2316 /* RxGesture */,
+				879FCEA22C6C674400FF2316 /* RxRelay */,
 			);
 			productName = TwitterClone;
 			productReference = 878FBEF32C2C004B00EFD31E /* TwitterClone.app */;
@@ -311,6 +323,8 @@
 			packageReferences = (
 				87C89EEB2C63DA1400F666E9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				879960752C68A565001CBBE6 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				879FCE9A2C6C4B3600FF2316 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				879FCE9F2C6C60A200FF2316 /* XCRemoteSwiftPackageReference "RxGesture" */,
 			);
 			productRefGroup = 878FBEF42C2C004B00EFD31E /* Products */;
 			projectDirPath = "";
@@ -606,6 +620,22 @@
 				kind = branch;
 			};
 		};
+		879FCE9A2C6C4B3600FF2316 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.7.1;
+			};
+		};
+		879FCE9F2C6C60A200FF2316 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.4;
+			};
+		};
 		87C89EEB2C63DA1400F666E9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -631,6 +661,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 879960752C68A565001CBBE6 /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImage;
+		};
+		879FCE9B2C6C4B3600FF2316 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 879FCE9A2C6C4B3600FF2316 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		879FCE9D2C6C4B3600FF2316 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 879FCE9A2C6C4B3600FF2316 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		879FCEA02C6C60A200FF2316 /* RxGesture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 879FCE9F2C6C60A200FF2316 /* XCRemoteSwiftPackageReference "RxGesture" */;
+			productName = RxGesture;
+		};
+		879FCEA22C6C674400FF2316 /* RxRelay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 879FCE9A2C6C4B3600FF2316 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxRelay;
 		};
 		87C89EED2C63DA2C00F666E9 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;

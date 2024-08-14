@@ -7,81 +7,66 @@
 
 import Foundation
 import FirebaseAuth
-import Combine
+import RxSwift
+import RxCocoa
 
-final class AuthenticationViewModel: ObservableObject {
+final class AuthenticationViewModel {
     
-    @Published var email: String?
-    @Published var password: String?
-    @Published var isAuthenticationFormValid: Bool = false
-    @Published var user: User?
-    @Published var error: String?
+    var email = BehaviorRelay<String?>(value: nil)
+    var password = BehaviorRelay<String?>(value: nil)
+    var isAuthenticationFormValid = BehaviorRelay<Bool>(value: false)
+    var user = PublishRelay<User?>()
+    var error = PublishRelay<String?>()
     
+    private let disposeBag = DisposeBag()
     
-    private var subscriptions: Set<AnyCancellable> = []
-    
-    func validateRegistrationForm() {
-        guard let email,
-              let password else {
-            isAuthenticationFormValid = false
-            return
-        }
-        isAuthenticationFormValid = isValidEmail(email) && password.count >= 8
+    init() {
+        Observable.combineLatest(email, password)
+            .map { [weak self] email, password in
+                return self?.isValidEmail(email ?? "") == true && password?.count ?? 0 >= 8
+            }
+            .bind(to: isAuthenticationFormValid)
+            .disposed(by: disposeBag)
     }
     
     func isValidEmail(_ email: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        
-        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
         return emailPred.evaluate(with: email)
     }
     
     func createUser() {
-        guard let email,
-              let password else{
-            return
-        }
+        guard let email = email.value, let password = password.value else { return }
+        
         AuthManager.shared.registerUser(with: email, password: password)
-            .handleEvents(receiveOutput: { [weak self] user in
-                self?.user = user
-            })
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] user in
+            .subscribe(onSuccess: { [weak self] user in
+                self?.user.accept(user)
                 self?.createRecord(for: user)
-            }
-            .store(in: &subscriptions)
+            }, onFailure: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
     
     func createRecord(for user: User) {
         DatabaseManager.shared.collectionUsers(add: user)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { state in
-                print("Adding user record to database: \(state)")
-            }
-            .store(in: &subscriptions)
-
+            .subscribe(onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            }, onCompleted: {
+                print("Adding user record to database successful")
+            })
+            .disposed(by: disposeBag)
     }
     
     func loginUser() {
-        guard let email,
-              let password else{
-            return
-        }
+        guard let email = email.value, let password = password.value else { return }
+        
         AuthManager.shared.loginUser(with: email, password: password)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] user in
-                self?.user = user
-            }
-            .store(in: &subscriptions)
+            .subscribe(onSuccess: { [weak self] user in
+                self?.user.accept(user)
+            }, onFailure: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
-
 }

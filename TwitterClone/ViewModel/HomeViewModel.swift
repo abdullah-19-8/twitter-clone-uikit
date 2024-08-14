@@ -6,45 +6,45 @@
 //
 
 import Foundation
-import Combine
 import FirebaseAuth
+import RxSwift
+import RxCocoa
 
-final class HomeViewModel: ObservableObject {
+final class HomeViewModel {
     
-    @Published var user: TwitterUser?
-    @Published var error: String?
-    @Published var tweets: [Tweet] = []
+    var user: BehaviorRelay<TwitterUser?>?
+    var error = PublishRelay<String>()
+    var tweets = BehaviorRelay<[Tweet]>(value: [])
     
-    private var subscription: Set<AnyCancellable> = []
+    private let disposeBag = DisposeBag()
+    
+    init(user: TwitterUser?) {
+        self.user = BehaviorRelay(value: user)
+        retreiveUser()
+    }
     
     func retreiveUser() {
         guard let id = Auth.auth().currentUser?.uid else { return }
         DatabaseManager.shared.collectionUsers(retreive: id)
-            .handleEvents(receiveOutput: { [weak self] user in
-                self?.user = user
-                self?.fetchTweets()
+            .observe(on: MainScheduler.instance)
+            .subscribe (onNext: { [weak self] user in
+                self?.user?.accept(user)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+                print(error.localizedDescription)
             })
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] user in
-                self?.user = user
-            }
-            .store(in: &subscription)
+            .disposed(by: disposeBag)
     }
     
     func fetchTweets() {
-        guard let id = user?.id else { return }
-        DatabaseManager.shared.collectionTweets(retreiveTweets: id)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] retreivedTweets in
-                self?.tweets = retreivedTweets
-            }
-            .store(in: &subscription)
+        DatabaseManager.shared.collectionTweets(retreiveTweets: user?.value?.id ?? "")
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] tweets in
+                self?.tweets.accept(tweets)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
     
 }

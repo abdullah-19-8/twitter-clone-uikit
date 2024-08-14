@@ -6,48 +6,57 @@
 //
 
 import Foundation
-import Combine
+import RxSwift
+import RxCocoa
 import FirebaseAuth
 
-final class TweetComposeViewModel: ObservableObject {
+final class TweetComposeViewModel {
     
-    private var subscriptions: Set<AnyCancellable> = []
+    private let disposeBag = DisposeBag()
     
-    @Published var isValedToTweet: Bool = false
-    @Published var error: String = ""
-    @Published var shouldDismissComposer: Bool = false
+    // RxSwift observables
+    var isValidToTweet = BehaviorRelay<Bool>(value: false)
+    var error = PublishRelay<String>()
+    var shouldDismissComposer = BehaviorRelay<Bool>(value: false)
     var tweetContent = ""
     private var user: TwitterUser?
     
     func getUserData() {
         guard let userID = Auth.auth().currentUser?.uid else { return }
+        
         DatabaseManager.shared.collectionUsers(retreive: userID)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self]  twitterUser in
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] twitterUser in
                 self?.user = twitterUser
-            }
-            .store(in: &subscriptions)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
     
     func validateToTweet() {
-        isValedToTweet = !tweetContent.isEmpty
+        isValidToTweet.accept(!tweetContent.isEmpty)
     }
     
     func dispatchTweet() {
-        guard let user else { return }
-        let tweet = Tweet(author: user, authorID: user.id, tweetContent: tweetContent, likesCount: 0, likers: [], isReply: false, paretnReference: nil)
+        guard let user = user else { return }
+        let tweet = Tweet(
+            author: user,
+            authorID: user.id,
+            tweetContent: tweetContent,
+            likesCount: 0,
+            likers: [],
+            isReply: false,
+            paretnReference: nil
+        )
+        
         DatabaseManager.shared.collectionTweets(dispatch: tweet)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] state in
-                self?.shouldDismissComposer = state
-            }
-            .store(in: &subscriptions)
-
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] state in
+                self?.shouldDismissComposer.accept(state)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
 }

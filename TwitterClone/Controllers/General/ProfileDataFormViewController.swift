@@ -7,19 +7,20 @@
 
 import UIKit
 import PhotosUI
-import Combine
+import RxSwift
+import RxCocoa
+import RxGesture
 
 class ProfileDataFormViewController: UIViewController {
     
-    private var viewModel = ProfileDataFormViewModel()
-    private var subscriptions: Set<AnyCancellable> = []
+    private let disposeBag = DisposeBag()
+    private let viewModel = ProfileDataFormViewModel()
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = true
         scrollView.keyboardDismissMode = .onDrag
-        
         return scrollView
     }()
     
@@ -29,12 +30,10 @@ class ProfileDataFormViewController: UIViewController {
         label.text = "Fill in your data"
         label.font = .systemFont(ofSize: 32, weight: .bold)
         label.textColor = .label
-        
         return label
     }()
     
     private let displayNameTextField: UITextField = {
-        
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.keyboardType = .default
@@ -44,12 +43,10 @@ class ProfileDataFormViewController: UIViewController {
         textField.layer.masksToBounds = true
         textField.layer.cornerRadius = 8
         textField.attributedPlaceholder = NSAttributedString(string: "Display Name", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
-        
         return textField
     }()
     
     private let usernameTextField: UITextField = {
-        
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.keyboardType = .default
@@ -59,12 +56,10 @@ class ProfileDataFormViewController: UIViewController {
         textField.layer.masksToBounds = true
         textField.layer.cornerRadius = 8
         textField.attributedPlaceholder = NSAttributedString(string: "Username", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
-        
         return textField
     }()
     
     private let avatarPlaceHolderImageView: UIImageView = {
-        
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
@@ -75,7 +70,6 @@ class ProfileDataFormViewController: UIViewController {
         imageView.tintColor = .gray
         imageView.isUserInteractionEnabled = true
         imageView.contentMode = .scaleAspectFill
-        
         return imageView
     }()
     
@@ -86,15 +80,13 @@ class ProfileDataFormViewController: UIViewController {
         textView.layer.masksToBounds = true
         textView.layer.cornerRadius = 8
         textView.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
-        textView.text = "Tell the world about your self"
+        textView.text = "Tell the world about yourself"
         textView.textColor = .gray
         textView.font = .systemFont(ofSize: 16)
-        
         return textView
     }()
     
     private let submitButton: UIButton = {
-        
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Submit", for: .normal)
@@ -105,7 +97,6 @@ class ProfileDataFormViewController: UIViewController {
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 25
         button.isEnabled = false
-        
         return button
     }()
     
@@ -126,45 +117,70 @@ class ProfileDataFormViewController: UIViewController {
         displayNameTextField.delegate = self
         usernameTextField.delegate = self
         configureConstraints()
-        submitButton.addTarget(self, action: #selector(didTapSubmit), for: .touchUpInside)
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapToDismess)))
-        avatarPlaceHolderImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapToUpload)))
         bindViews()
+        setupGestures()
     }
     
-    @objc private func didTapSubmit() {
-        viewModel.uploadAvatar()
-    }
-    
-    @objc private func didUpdateDisplayName() {
-        viewModel.displayName = displayNameTextField.text
-        viewModel.validateUserProfileForm()
-    }
-    
-    @objc private func didUpdateusername() {
-        viewModel.username = usernameTextField.text
-        viewModel.validateUserProfileForm()
+    private func setupGestures() {
+        submitButton.rx.tap
+            .bind { [weak self] in
+                self?.viewModel.uploadAvatar()
+            }
+            .disposed(by: disposeBag)
+        
+        avatarPlaceHolderImageView.rx.tapGesture()
+            .when(.recognized)
+            .bind { [weak self] _ in
+                self?.didTapToUpload()
+            }
+            .disposed(by: disposeBag)
+        
+        view.rx.tapGesture()
+            .when(.recognized)
+            .bind { [weak self] _ in
+                self?.view.endEditing(true)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func bindViews() {
-        displayNameTextField.addTarget(self, action: #selector(didUpdateDisplayName), for: .editingChanged)
-        usernameTextField.addTarget(self, action: #selector(didUpdateusername), for: .editingChanged)
-        viewModel.$isFormValid.sink { [weak self] buttonState in
-            self?.submitButton.isEnabled = buttonState
-        }
-        .store(in: &subscriptions)
+        displayNameTextField.rx.text
+            .orEmpty
+            .bind { [weak self] text in
+                self?.viewModel.displayName.accept(text)
+                self?.viewModel.validateUserProfileForm()
+            }
+            .disposed(by: disposeBag)
         
-        viewModel.$isOnboardingFinished.sink { [weak self] success in
-            if success {
+        usernameTextField.rx.text
+            .orEmpty
+            .bind { [weak self] text in
+                self?.viewModel.username.accept(text)
+                self?.viewModel.validateUserProfileForm()
+            }
+            .disposed(by: disposeBag)
+        
+        bioTextView.rx.text
+            .orEmpty
+            .bind { [weak self] text in
+                self?.viewModel.bio.accept(text)
+                self?.viewModel.validateUserProfileForm()
+            }
+            .disposed(by: disposeBag)
+        
+        viewModel.isFormValid
+            .bind(to: submitButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        viewModel.isOnboardingFinished
+            .filter { $0 }
+            .bind { [weak self] _ in
                 self?.dismiss(animated: true)
             }
-        }
-        .store(in: &subscriptions)
+            .disposed(by: disposeBag)
     }
     
-    
-    
-    @objc private func didTapToUpload() {
+    private func didTapToUpload() {
         var configuration = PHPickerConfiguration()
         configuration.filter = .images
         configuration.selectionLimit = 1
@@ -173,12 +189,7 @@ class ProfileDataFormViewController: UIViewController {
         present(picker, animated: true)
     }
     
-    @objc private func didTapToDismess() {
-        view.endEditing(true)
-    }
-    
     private func configureConstraints() {
-        
         let scrollViewConstraints = [
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -246,14 +257,14 @@ extension ProfileDataFormViewController: UITextViewDelegate, UITextFieldDelegate
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        viewModel.bio = textView.text
+        viewModel.bio.accept(textView.text)
         viewModel.validateUserProfileForm()
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
         scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
         if textView.text.isEmpty {
-            textView.text = "Tell the world about your self"
+            textView.text = "Tell the world about yourself"
             textView.textColor = .gray
         }
     }
@@ -276,7 +287,7 @@ extension ProfileDataFormViewController: PHPickerViewControllerDelegate {
                 if let image = object as? UIImage {
                     DispatchQueue.main.async {
                         self?.avatarPlaceHolderImageView.image = image
-                        self?.viewModel.imageData = image
+                        self?.viewModel.imageData.accept(image)
                         self?.viewModel.validateUserProfileForm()
                     }
                 }

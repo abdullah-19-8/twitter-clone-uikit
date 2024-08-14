@@ -19,8 +19,17 @@ struct TwitterUser: Codable {
     var avatarPath: String = ""
     var isUserOnboarded: Bool = false
     
+    // Default initializer
+    static var `default`: TwitterUser {
+        return TwitterUser(id: UUID().uuidString) // Or provide other default values
+    }
+    
     init(from user: User)  {
         self.id = user.uid
     }
-     
+    
+    init(id: String) {
+        self.id = id
+    }
 }
+

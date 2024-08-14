@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class SearchViewController: UIViewController {
     
@@ -14,7 +16,6 @@ class SearchViewController: UIViewController {
         searchController.searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchController.searchBar.searchBarStyle = .minimal
         searchController.searchBar.placeholder = "Search with @username"
-        
         return searchController
     }()
     
@@ -26,25 +27,12 @@ class SearchViewController: UIViewController {
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 32, weight: .bold)
         label.textColor = .placeholderText
-        
         return label
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.addSubview(promptLabel)
-        
-        navigationItem.searchController = searchController
-        
-        searchController.searchResultsUpdater = self
-        
-        configureConstraints()
-        
-        
-    }
+    private let disposeBag = DisposeBag()
     
-    let viewModel : SearchViewModel
+    let viewModel: SearchViewModel
     
     init(viewModel: SearchViewModel) {
         self.viewModel = viewModel
@@ -55,26 +43,65 @@ class SearchViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.addSubview(promptLabel)
+        navigationItem.searchController = searchController
+        searchController.searchResultsUpdater = self
+        
+        configureConstraints()
+        bindViewModel()
+    }
     
     private func configureConstraints() {
-        
         let promptLabelConstraints = [
             promptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             promptLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             promptLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ]
-        
         NSLayoutConstraint.activate(promptLabelConstraints)
+    }
+    
+    private func bindViewModel() {
+        // Bind search bar text to view model search
+        searchController.searchBar.rx.text
+            .orEmpty
+            .distinctUntilChanged()
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] query in
+                self?.viewModel.search(with: query)
+            })
+            .disposed(by: disposeBag)
+        
+        // Bind view model users to search results view controller
+        viewModel.users
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] users in
+                guard let resultsViewController = self?.searchController.searchResultsController as? SearchResultsViewController else { return }
+                resultsViewController.update(users: users)
+            })
+            .disposed(by: disposeBag)
+        
+        // Handle errors
+        viewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] errorMessage in
+                self?.presentAlert(with: errorMessage)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func presentAlert(with message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        let okButton = UIAlertAction(title: "Ok", style: .default)
+        alert.addAction(okButton)
+        present(alert, animated: true)
     }
 }
 
 extension SearchViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-       guard let resultsViewController =  searchController.searchResultsController as? SearchResultsViewController,
-             let query = searchController.searchBar.text
-        else { return }
-        viewModel.search(with: query) { users in
-            resultsViewController.update(users: users)
-        }
+        // No longer needed as we use RxSwift to handle updates
     }
 }

@@ -6,12 +6,13 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import RxCocoa
 
 class TweetComposeViewController: UIViewController {
     
     private var viewModel = TweetComposeViewModel()
-    private var subscriptions: Set<AnyCancellable> = []
+    private var disposeBag = DisposeBag()
     
     private let tweetButton: UIButton = {
         let button = UIButton(type: .system)
@@ -62,18 +63,23 @@ class TweetComposeViewController: UIViewController {
     }
     
     private func bindViews() {
-        viewModel.$isValedToTweet.sink { [weak self] state in
-            self?.tweetButton.isEnabled = state
-        }
-        .store(in: &subscriptions)
-        
-        viewModel.$shouldDismissComposer.sink {[weak self] success in
-            if success {
-                self?.dismiss(animated: true)
+        viewModel.isValidToTweet
+            .observe(on: MainScheduler.instance) // Ensure UI updates are on the main thread
+            .bind { [weak self] isValid in
+                self?.tweetButton.isEnabled = isValid
             }
-        }
-        .store(in: &subscriptions)
+            .disposed(by: disposeBag)
+        
+        viewModel.shouldDismissComposer
+            .observe(on: MainScheduler.instance) // Ensure UI updates are on the main thread
+            .bind { [weak self] shouldDismiss in
+                if shouldDismiss {
+                    self?.dismiss(animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewModel.getUserData()
@@ -101,7 +107,6 @@ class TweetComposeViewController: UIViewController {
     @objc private func didTapToCancel() {
         dismiss(animated: true)
     }
-
 }
 
 extension TweetComposeViewController: UITextViewDelegate {
@@ -124,4 +129,3 @@ extension TweetComposeViewController: UITextViewDelegate {
         viewModel.validateToTweet()
     }
 }
-

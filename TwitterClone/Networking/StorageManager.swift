@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import Combine
+import RxSwift
 import FirebaseStorage
-import FirebaseStorageCombineSwift
 
 enum FireStorageError: Error {
-    case invaledImageID
+    case invalidImageID
 }
 
 final class StorageManager {
@@ -20,25 +19,35 @@ final class StorageManager {
     
     let storage = Storage.storage()
     
-    func getDownloadUrl(for id: String?) -> AnyPublisher<URL, Error> {
-        guard let id else{
-            return Fail(error: FireStorageError.invaledImageID)
-                .eraseToAnyPublisher()
+    func getDownloadUrl(for id: String?) -> Observable<URL> {
+        guard let id else {
+            return Observable.error(FireStorageError.invalidImageID)
         }
-        return storage
-            .reference(withPath: id)
-            .downloadURL()
-            .print()
-            .eraseToAnyPublisher()
-        
+        return Observable.create { observer in
+            self.storage.reference(withPath: id).downloadURL { url, error in
+                if let error = error {
+                    observer.onError(error)
+                } else if let url = url {
+                    observer.onNext(url)
+                    observer.onCompleted()
+                }
+            }
+            return Disposables.create()
+        }
     }
     
-    func uploadProfilePhoto(with randomID: String, image: Data, metaData: StorageMetadata) -> AnyPublisher<StorageMetadata, Error> {
-        return storage
-            .reference()
-            .child("images/\(randomID).jpg")
-            .putData(image, metadata: metaData)
-            .print()
-            .eraseToAnyPublisher()
+    func uploadProfilePhoto(with randomID: String, image: Data, metaData: StorageMetadata) -> Observable<StorageMetadata> {
+        return Observable.create { observer in
+            self.storage.reference().child("images/\(randomID).jpg").putData(image, metadata: metaData) { metadata, error in
+                if let error = error {
+                    observer.onError(error)
+                } else if let metadata = metadata {
+                    observer.onNext(metadata)
+                    observer.onCompleted()
+                }
+            }
+            return Disposables.create()
+        }
     }
 }
+

@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class SearchResultsViewController: UIViewController {
     
-    var users: [TwitterUser] = []
+    private let disposeBag = DisposeBag()
+    private let usersSubject = BehaviorSubject<[TwitterUser]>(value: [])
     
     private let searchResultsTableView: UITableView = {
         let table = UITableView()
@@ -17,61 +20,46 @@ class SearchResultsViewController: UIViewController {
         table.register(UserTableViewCell.self, forCellReuseIdentifier: UserTableViewCell.identifier)
         return table
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(searchResultsTableView)
-
         configureConstraints()
         
-        searchResultsTableView.dataSource = self
-        searchResultsTableView.delegate = self
+        setupBindings()
     }
     
     func update(users: [TwitterUser]) {
-        self.users = users
-        DispatchQueue.main.async { [weak self] in
-            self?.searchResultsTableView.reloadData()
-        }
+        usersSubject.onNext(users)
+    }
+    
+    private func setupBindings() {
+        // Bind the users array to the table view
+        usersSubject
+            .bind(to: searchResultsTableView.rx.items(cellIdentifier: UserTableViewCell.identifier, cellType: UserTableViewCell.self)) { index, user, cell in
+                cell.configure(with: user)
+            }
+            .disposed(by: disposeBag)
+        
+        // Handle row selection
+        searchResultsTableView.rx.modelSelected(TwitterUser.self)
+            .subscribe(onNext: { [weak self] user in
+                self?.handleUserSelection(user)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func configureConstraints() {
-        
-        let searchResultsTableViewConstraints = [
+        NSLayoutConstraint.activate([
             searchResultsTableView.topAnchor.constraint(equalTo: view.topAnchor),
             searchResultsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchResultsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             searchResultsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(searchResultsTableViewConstraints)
-    }
-}
-
-extension SearchResultsViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return users.count
+        ])
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: UserTableViewCell.identifier, for: indexPath) as?
-                UserTableViewCell
-        else { return UITableViewCell() }
-        let user = users[indexPath.row]
-        cell.configure(with: user)
-        return cell
-    }
-}
-
-extension SearchResultsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        90
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let user = users[indexPath.row]
+    private func handleUserSelection(_ user: TwitterUser) {
         let profileViewModel = ProfileViewModel(user: user)
         let vc = ProfileViewController(viewModel: profileViewModel)
         present(vc, animated: true)

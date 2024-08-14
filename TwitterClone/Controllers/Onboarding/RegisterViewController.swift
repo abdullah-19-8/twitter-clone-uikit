@@ -6,25 +6,23 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import RxCocoa
 
 class RegisterViewController: UIViewController {
     
-    private var viewModel = AuthenticationViewModel()
-    private var subscription: Set<AnyCancellable> = []
+    private let viewModel = AuthenticationViewModel()
+    private let disposeBag = DisposeBag()
     
     private let registerTitleLabel: UILabel = {
-        
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Create your account"
         label.font = .systemFont(ofSize: 32, weight: .bold)
-        
         return label
     }()
     
     private let emailTextField: UITextField = {
-        
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.keyboardType = .emailAddress
@@ -32,12 +30,10 @@ class RegisterViewController: UIViewController {
             string: "Email",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
         )
-        
         return textField
     }()
     
     private let passwordTextField: UITextField = {
-        
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(
@@ -45,12 +41,10 @@ class RegisterViewController: UIViewController {
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]
         )
         textField.isSecureTextEntry = true
-        
         return textField
     }()
     
     private let registerButton: UIButton = {
-        
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Create account", for: .normal)
@@ -61,40 +55,54 @@ class RegisterViewController: UIViewController {
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 25
         button.isEnabled = false
-        
         return button
     }()
     
-    @objc private func didChangeEmailField() {
-        viewModel.email = emailTextField.text
-        viewModel.validateRegistrationForm()
-    }
-    
-    @objc private func didChangePasswordField() {
-        viewModel.password = passwordTextField.text
-        viewModel.validateRegistrationForm()
-    }
-    
-    private func bindView() {
-        emailTextField.addTarget(self, action: #selector(didChangeEmailField), for: .editingChanged)
-        passwordTextField.addTarget(self, action: #selector(didChangePasswordField), for: .editingChanged)
-        viewModel.$isAuthenticationFormValid.sink { [weak self] validationState in
-            self?.registerButton.isEnabled = validationState
-        }
-        .store(in: &subscription)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        viewModel.$user.sink { [weak self] user in
-            guard user != nil else { return }
-            guard let vc = self?.navigationController?.viewControllers.first as? OnboardingViewController else { return }
-            vc.dismiss(animated: true)
-        }
-        .store(in: &subscription)
+        view.backgroundColor = .systemBackground
         
-        viewModel.$error.sink { [weak self] error in
-            guard let error else { return }
-            self?.presentAlert(with: error)
-        }
-        .store(in: &subscription)
+        view.addSubview(registerTitleLabel)
+        view.addSubview(emailTextField)
+        view.addSubview(passwordTextField)
+        view.addSubview(registerButton)
+        
+        registerButton.rx.tap
+            .bind { [weak self] in
+                self?.viewModel.createUser()
+            }
+            .disposed(by: disposeBag)
+        
+        emailTextField.rx.text.orEmpty
+            .bind(to: viewModel.email)
+            .disposed(by: disposeBag)
+        
+        passwordTextField.rx.text.orEmpty
+            .bind(to: viewModel.password)
+            .disposed(by: disposeBag)
+        
+        viewModel.isAuthenticationFormValid
+            .bind(to: registerButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        viewModel.user
+            .subscribe(onNext: { [weak self] user in
+                guard user != nil else { return }
+                guard let vc = self?.navigationController?.viewControllers.first as? OnboardingViewController else { return }
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.error
+            .subscribe(onNext: { [weak self] error in
+                self?.presentAlert(with: error ?? "")
+            })
+            .disposed(by: disposeBag)
+        
+        configureConstraints()
+        
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapToDismess)))
     }
     
     private func presentAlert(with error: String) {
@@ -108,62 +116,27 @@ class RegisterViewController: UIViewController {
         view.endEditing(true)
     }
     
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = .systemBackground
-        
-        view.addSubview(registerTitleLabel)
-        view.addSubview(emailTextField)
-        view.addSubview(passwordTextField)
-        view.addSubview(registerButton)
-        registerButton.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
-        
-        configureConstraints()
-        
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapToDismess)))
-        bindView()
-    }
-    
-    @objc private func didTapRegister() {
-        viewModel.createUser()
-    }
     private func configureConstraints() {
-        
-        let registerTitleLabelConstraints = [
+        NSLayoutConstraint.activate([
             registerTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             registerTitleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-        ]
-        
-        let emailTextFieldConstraints = [
+            
             emailTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             emailTextField.topAnchor.constraint(equalTo: registerTitleLabel.bottomAnchor, constant: 20),
             emailTextField.widthAnchor.constraint(equalToConstant: view.frame.width - 40),
             emailTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emailTextField.heightAnchor.constraint(equalToConstant: 60)
-        ]
-        
-        let passwordTextFieldConstraints = [
+            emailTextField.heightAnchor.constraint(equalToConstant: 60),
+            
             passwordTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 15),
             passwordTextField.widthAnchor.constraint(equalToConstant: view.frame.width - 40),
             passwordTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            passwordTextField.heightAnchor.constraint(equalToConstant: 60)
-        ]
-        
-        let registerButtonConstraints = [
+            passwordTextField.heightAnchor.constraint(equalToConstant: 60),
+            
             registerButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             registerButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20),
             registerButton.widthAnchor.constraint(equalToConstant: 180),
             registerButton.heightAnchor.constraint(equalToConstant: 50)
-        ]
-        
-        NSLayoutConstraint.activate(registerTitleLabelConstraints)
-        NSLayoutConstraint.activate(emailTextFieldConstraints)
-        NSLayoutConstraint.activate(passwordTextFieldConstraints)
-        NSLayoutConstraint.activate(registerButtonConstraints)
+        ])
     }
-    
 }

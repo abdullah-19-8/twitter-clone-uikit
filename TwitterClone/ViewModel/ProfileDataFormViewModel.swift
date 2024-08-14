@@ -6,70 +6,68 @@
 //
 
 import Foundation
-import Combine
+import RxSwift
+import RxCocoa
 import UIKit
 import FirebaseStorage
 import FirebaseAuth
 
-final class ProfileDataFormViewModel: ObservableObject {
+final class ProfileDataFormViewModel {
     
-    private var subscriptions: Set<AnyCancellable> = []
-    @Published var displayName: String?
-    @Published var username: String?
-    @Published var bio: String?
-    @Published var avatarPath: String?
-    @Published var imageData: UIImage?
-    @Published var isFormValid: Bool = false
-    @Published var isOnboardingFinished: Bool = false
+    private let disposeBag = DisposeBag()
     
-    @Published var error: String = ""
+    // Observables
+    var displayName = BehaviorRelay<String?>(value: nil)
+    var username = BehaviorRelay<String?>(value: nil)
+    var bio = BehaviorRelay<String?>(value: nil)
+    var avatarPath = BehaviorRelay<String?>(value: nil)
+    var imageData = BehaviorRelay<UIImage?>(value: nil)
+    var isFormValid = BehaviorRelay<Bool>(value: false)
+    var isOnboardingFinished = BehaviorRelay<Bool>(value: false)
+    
+    let error = PublishRelay<String>()
     
     func validateUserProfileForm() {
-        guard let displayName,
-              displayName.count > 2,
-              let username,
-              username.count > 2,
-              let bio,
-              bio.count > 2,
-              imageData != nil else{
-            isFormValid = false
-            return
-        }
-        isFormValid = true
+        let displayName = self.displayName.value
+        let username = self.username.value
+        let bio = self.bio.value
+        let imageData = self.imageData.value
+        
+        let isValid = (displayName?.count ?? 0) > 2 &&
+                      (username?.count ?? 0) > 2 &&
+                      (bio?.count ?? 0) > 2 &&
+                      imageData != nil
+        
+        isFormValid.accept(isValid)
     }
     
     func uploadAvatar() {
-        
         let randomID = UUID().uuidString
-        guard let imageData = imageData?.jpegData(compressionQuality: 0.5) else { return }
+        guard let imageData = self.imageData.value?.jpegData(compressionQuality: 0.5) else { return }
+        
         let metaData = StorageMetadata()
         metaData.contentType = "image/jpeg"
+        
         StorageManager.shared.uploadProfilePhoto(with: randomID, image: imageData, metaData: metaData)
-            .flatMap({ metaData in
+            .flatMap { metaData in
                 StorageManager.shared.getDownloadUrl(for: metaData.path)
-            })
-            .sink { [weak self] completion in
-                switch completion {
-                case .failure(let error):
-                    print(error.localizedDescription)
-                    self?.error = error.localizedDescription
-                    
-                case .finished:
-                    self?.updateUserData()
-                }
-            } receiveValue: { [weak self] url in
-                self?.avatarPath = url.absoluteString
             }
-            .store(in: &subscriptions)
+            .subscribe(onNext: { [weak self] url in
+                self?.avatarPath.accept(url.absoluteString)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            }, onCompleted: { [weak self] in
+                self?.updateUserData()
+            })
+            .disposed(by: disposeBag)
     }
     
     private func updateUserData() {
-        guard let displayName,
-              let username,
-              let bio,
-              let avatarPath,
-              let id = Auth.auth().currentUser?.uid
-        else { return }
+        guard let displayName = self.displayName.value,
+              let username = self.username.value,
+              let bio = self.bio.value,
+              let avatarPath = self.avatarPath.value,
+              let id = Auth.auth().currentUser?.uid else { return }
         
         let updatedFields: [String: Any] = [
             "displayName": displayName,
@@ -80,16 +78,11 @@ final class ProfileDataFormViewModel: ObservableObject {
         ]
         
         DatabaseManager.shared.collectionUsers(updateFields: updatedFields, for: id)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error.localizedDescription
-                }
-            } receiveValue: { [weak self] onboardingState in
-                self?.isOnboardingFinished = onboardingState
-            }
-            .store(in: &subscriptions)
-
+            .subscribe(onNext: { [weak self] onboardingState in
+                self?.isOnboardingFinished.accept(onboardingState)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
-    
-    
 }

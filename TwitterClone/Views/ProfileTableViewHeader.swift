@@ -6,12 +6,15 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import RxCocoa
 
 class ProfileTableViewHeader: UIView {
     
     private var currentFollowState: ProfileFollowingState = .personal
-    var followButtonActionPublisher: PassthroughSubject<ProfileFollowingState, Never> = PassthroughSubject()
+    private let disposeBag = DisposeBag()
+    
+    let followButtonAction: PublishSubject<ProfileFollowingState> = PublishSubject()
     
     private enum SectionTabs: String {
         case tweets = "Tweets"
@@ -55,6 +58,7 @@ class ProfileTableViewHeader: UIView {
             }
         }
     }
+    
     private var tabs: [UIButton] = ["Tweets", "Tweets & Replies", "Media", "Likes"]
         .map { buttonTitle in
             let button = UIButton(type: .system)
@@ -74,17 +78,16 @@ class ProfileTableViewHeader: UIView {
         return stackView
     }()
     
-     var followersTextLabel: UILabel = {
+    var followersTextLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Followers"
         label.textColor = .secondaryLabel
         label.font = .systemFont(ofSize: 14, weight: .regular)
-        
         return label
     }()
     
-     var followersCountLabel: UILabel = {
+    var followersCountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .label
@@ -92,17 +95,16 @@ class ProfileTableViewHeader: UIView {
         return label
     }()
     
-     var followingTextLabel: UILabel = {
+    var followingTextLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Following"
         label.textColor = .secondaryLabel
         label.font = .systemFont(ofSize: 14, weight: .regular)
-        
         return label
     }()
     
-     var followingCountLabel: UILabel = {
+    var followingCountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .label
@@ -110,7 +112,7 @@ class ProfileTableViewHeader: UIView {
         return label
     }()
     
-     var joinDateLabel: UILabel = {
+    var joinDateLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .secondaryLabel
@@ -118,7 +120,7 @@ class ProfileTableViewHeader: UIView {
         return label
     }()
     
-     private let joinDateImageView: UIImageView = {
+    private let joinDateImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(pointSize: 14))
@@ -126,7 +128,7 @@ class ProfileTableViewHeader: UIView {
         return imageView
     }()
     
-     var userBioLabel: UILabel = {
+    var userBioLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 3
@@ -135,7 +137,7 @@ class ProfileTableViewHeader: UIView {
         return label
     }()
     
-     var usernameLabel: UILabel = {
+    var usernameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .secondaryLabel
@@ -143,7 +145,7 @@ class ProfileTableViewHeader: UIView {
         return label
     }()
     
-     var displayNameLabel: UILabel = {
+    var displayNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 22, weight: .bold)
@@ -169,17 +171,14 @@ class ProfileTableViewHeader: UIView {
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
-        
     }()
     
     private let followButton: UIButton = {
-        
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .twitterBlueColor
         button.clipsToBounds = true
         button.layer.cornerRadius = 20
-                
         return button
     }()
     
@@ -207,11 +206,12 @@ class ProfileTableViewHeader: UIView {
     }
     
     private func configureFollowButtonAction() {
-        followButton.addTarget(self, action: #selector(didTapFollowButton), for: .touchUpInside)
-    }
-    
-    @objc private func didTapFollowButton() {
-        followButtonActionPublisher.send(currentFollowState)
+        followButton.rx.tap
+            .bind { [weak self] in
+                guard let self = self else { return }
+                self.followButtonAction.onNext(self.currentFollowState)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func configureStackButton() {
@@ -224,13 +224,30 @@ class ProfileTableViewHeader: UIView {
                 button.tintColor = .secondaryLabel
             }
             
-            button.addTarget(self, action: #selector(didTapTab(_:)), for: .touchUpInside)
+            button.rx.tap
+                .bind { [weak self] in
+                    guard let self = self else { return }
+                    switch button.titleLabel?.text {
+                    case SectionTabs.tweets.rawValue:
+                        self.selectedTab = 0
+                    case SectionTabs.tweetsAndReplies.rawValue:
+                        self.selectedTab = 1
+                    case SectionTabs.media.rawValue:
+                        self.selectedTab = 2
+                    case SectionTabs.likes.rawValue:
+                        self.selectedTab = 3
+                    default:
+                        self.selectedTab = 0
+                    }
+                }
+                .disposed(by: disposeBag)
         }
     }
     
     func configureAsUnFollow() {
         followButton.setTitle("Unfollow", for: .normal)
         followButton.backgroundColor = .systemBackground
+        followButton.setTitleColor(.twitterBlueColor, for: .normal)
         followButton.layer.borderWidth = 2
         followButton.layer.borderColor = UIColor.twitterBlueColor.cgColor
         followButton.isHidden = false
@@ -249,22 +266,6 @@ class ProfileTableViewHeader: UIView {
     func configureAsPersonal() {
         followButton.isHidden = true
         currentFollowState = .personal
-    }
-    
-    @objc private func didTapTab(_ sender: UIButton) {
-        guard let label = sender.titleLabel?.text else { return }
-        switch label {
-        case SectionTabs.tweets.rawValue:
-            selectedTab = 0
-        case SectionTabs.tweetsAndReplies.rawValue:
-            selectedTab = 1
-        case SectionTabs.media.rawValue:
-            selectedTab = 2
-        case SectionTabs.likes.rawValue:
-            selectedTab = 3
-        default:
-            selectedTab = 0
-        }
     }
     
     required init?(coder: NSCoder) {
@@ -312,7 +313,6 @@ class ProfileTableViewHeader: UIView {
         
         let joinDateImageViewConstraints = [
             joinDateImageView.leadingAnchor.constraint(equalTo: displayNameLabel.leadingAnchor),
-            
             joinDateImageView.topAnchor.constraint(equalTo: userBioLabel.bottomAnchor, constant: 5),
         ]
         
@@ -377,5 +377,4 @@ class ProfileTableViewHeader: UIView {
         NSLayoutConstraint.activate(indicatorConstraints)
         NSLayoutConstraint.activate(followButtonConstraints)
     }
-    
 }

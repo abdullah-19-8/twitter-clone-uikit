@@ -6,22 +6,26 @@
 //
 
 import Foundation
-import Combine
+import RxSwift
+import RxCocoa
 
 class SearchViewModel {
     
-    var subscriptions: Set<AnyCancellable> = []
+    private let disposeBag = DisposeBag()
     
-    func search(with query: String, _ completion: @escaping ([TwitterUser]) -> Void) {
+    // Relay for handling errors or updates
+    let users = PublishRelay<[TwitterUser]>()
+    let error = PublishRelay<String>()
+    
+    func search(with query: String) {
         DatabaseManager.shared.collectionUsers(search: query)
-            .sink { completion in
-                if case .failure(let error) = completion {
-                    print(error.localizedDescription)
-                }
-            } receiveValue: { users in
-                completion(users)
-            }
-            .store(in: &subscriptions)
-
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] users in
+                self?.users.accept(users)
+            }, onError: { [weak self] error in
+                self?.error.accept(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
 }
+

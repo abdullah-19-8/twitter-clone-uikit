@@ -6,25 +6,36 @@
 //
 
 import Foundation
-import Firebase
-import FirebaseAuthCombineSwift
 import FirebaseAuth
-import Combine
+import RxSwift
 
 class AuthManager {
     
     static let shared = AuthManager()
     
-    func registerUser(with email: String, password: String) -> AnyPublisher<User, Error> {
-        
-        return Auth.auth().createUser(withEmail: email, password: password)
-            .map(\.user)
-            .eraseToAnyPublisher()
+    func registerUser(with email: String, password: String) -> Single<User> {
+        return Single<User>.create { single in
+            Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                if let error = error {
+                    single(.failure(error))
+                } else if let user = result?.user {
+                    single(.success(user))
+                }
+            }
+            return Disposables.create()
+        }
     }
     
-    func loginUser(with email: String, password: String) -> AnyPublisher<User, Error> {
-        return Auth.auth().signIn(withEmail: email, password: password)
-            .map(\.user)
-            .eraseToAnyPublisher()
+    func loginUser(with email: String, password: String) -> Single<User> {
+        return Single<User>.create { single in
+            Auth.auth().signIn(withEmail: email, password: password) { result, error in
+                if let error = error {
+                    single(.failure(error))
+                } else if let user = result?.user {
+                    single(.success(user))
+                }
+            }
+            return Disposables.create()
+        }
     }
 }
