@@ -6,15 +6,19 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class MainTabBarViewController: UITabBarController {
+
+    private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .systemBackground
         
-        let vc1 = UINavigationController(rootViewController: HomeViewController(viewModel: HomeViewModel(user: nil)))
+        let vc1 = UINavigationController(rootViewController: HomeViewController())
         let vc2 = UINavigationController(rootViewController: SearchViewController(viewModel: SearchViewModel()))
         let vc3 = UINavigationController(rootViewController: NotificationViewController())
         let vc4 = UINavigationController(rootViewController: DirectMessagesViewController())
@@ -32,8 +36,13 @@ class MainTabBarViewController: UITabBarController {
         vc4.tabBarItem.selectedImage = UIImage(systemName: "envelope.fill")
         
         setViewControllers([vc1, vc2, vc3, vc4], animated: true)
+        
+        // RxSwift: Handling tab bar selection changes reactively
+        self.rx.didSelect
+            .subscribe(onNext: { viewController in
+                print("Selected view controller: \(viewController)")
+                // Handle any additional logic here
+            })
+            .disposed(by: disposeBag)
     }
-
-
 }
-

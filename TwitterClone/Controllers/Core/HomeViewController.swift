@@ -12,17 +12,8 @@ import RxCocoa
 
 class HomeViewController: UIViewController {
     
+    private var viewModel = HomeViewModel()
     private let disposeBag = DisposeBag()
-    private var viewModel: HomeViewModel
-    
-    init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     private lazy var composeTweetButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction { [weak self] _ in
@@ -35,17 +26,12 @@ class HomeViewController: UIViewController {
         button.setImage(plusSign, for: .normal)
         button.layer.cornerRadius = 30
         button.clipsToBounds = true
+        
         return button
     }()
     
-    private lazy var timelineTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(TweetTableViewCell.self, forCellReuseIdentifier: TweetTableViewCell.identifier)
-        return tableView
-    }()
-    
     private func configureNavigationBar() {
-        let size: CGFloat = 36
+        let size:CGFloat = 36
         let logoImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: size, height: size))
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.image = UIImage(named: "xLogo")
@@ -58,11 +44,18 @@ class HomeViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: profileImage, style: .plain, target: self, action: #selector(didTapProfile))
     }
     
-    @objc private func didTapProfile() {
-        let profileViewModel = ProfileViewModel(user: viewModel.user?.value ?? TwitterUser.default)
+    @objc private func didTapProfile(){
+        guard let user = viewModel.user.value else { return }
+        let profileViewModel = ProfileViewModel(user: user)
         let vc = ProfileViewController(viewModel: profileViewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    private let timelineTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(TweetTableViewCell.self, forCellReuseIdentifier: TweetTableViewCell.identifier)
+        return tableView
+    }()
     
     @objc private func didTapSignOut() {
         try? Auth.auth().signOut()
@@ -74,12 +67,33 @@ class HomeViewController: UIViewController {
         
         view.addSubview(timelineTableView)
         view.addSubview(composeTweetButton)
-        
+        timelineTableView.delegate = self
+        timelineTableView.dataSource = self
         configureNavigationBar()
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), style: .plain, target: self, action: #selector(didTapSignOut))
-        
         bindViews()
+        
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        timelineTableView.frame = view.frame
         configureConstraints()
+    }
+    
+    private func handleAuthentication() {
+        if Auth.auth().currentUser == nil {
+            let vc = UINavigationController(rootViewController: OnboardingViewController())
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: true)
+        }
+    }
+    
+    private func navigateToTweetComposer() {
+        let vc = UINavigationController(rootViewController: TweetComposeViewController())
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -95,53 +109,22 @@ class HomeViewController: UIViewController {
         present(vc, animated: true)
     }
     
-    private func navigateToTweetComposer() {
-        let vc = UINavigationController(rootViewController: TweetComposeViewController())
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true)
-    }
-    
-    private func handleAuthentication() {
-        if Auth.auth().currentUser == nil {
-            let vc = UINavigationController(rootViewController: OnboardingViewController())
-            vc.modalPresentationStyle = .fullScreen
-            present(vc, animated: true)
-        }
-    }
-    
-    private func bindViews() {
-        // Bind user to check for onboarding
-        viewModel.user?
+    func bindViews() {
+        viewModel.user
             .compactMap { $0 }
-            .filter { !$0.isUserOnboarded }
-            .bind { [weak self] _ in
-                self?.completeUserOnboarding()
-            }
+            .subscribe(onNext: { [weak self] user in
+                if !user.isUserOnboarded {
+                    self?.completeUserOnboarding()
+                }
+            })
             .disposed(by: disposeBag)
         
-        // Bind tweets to reload table view
         viewModel.tweets
-            .bind(to: timelineTableView.rx.items(cellIdentifier: TweetTableViewCell.identifier, cellType: TweetTableViewCell.self)) { index, tweet, cell in
-                cell.configureTweet(with: tweet.author.displayName,
-                                    username: tweet.author.username,
-                                    tweetTextContent: tweet.tweetContent,
-                                    avatarPath: tweet.author.avatarPath)
-            }
-            .disposed(by: disposeBag)
-        
-        // Handle tweet cell button taps
-        timelineTableView.rx.itemSelected
-            .bind { [weak self] indexPath in
-                let tweet = self?.viewModel.tweets.value[indexPath.row]
-                print("Selected tweet: \(String(describing: tweet))")
-            }
-            .disposed(by: disposeBag)
-        
-        // Handle compose tweet button tap
-        composeTweetButton.rx.tap
-            .bind { [weak self] in
-                self?.navigateToTweetComposer()
-            }
+            .subscribe(onNext: { [weak self] _ in
+                DispatchQueue.main.async {
+                    self?.timelineTableView.reloadData()
+                }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -153,15 +136,46 @@ class HomeViewController: UIViewController {
             composeTweetButton.widthAnchor.constraint(equalToConstant: 60)
         ]
         
-        let timelineTableViewConstraints = [
-            timelineTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            timelineTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            timelineTableView.topAnchor.constraint(equalTo: view.topAnchor),
-            timelineTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ]
-        
         NSLayoutConstraint.activate(composeTweetButtonConstraints)
-        NSLayoutConstraint.activate(timelineTableViewConstraints)
     }
 }
 
+extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.tweets.value.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: TweetTableViewCell.identifier, for: indexPath) as? TweetTableViewCell else {
+            return UITableViewCell()
+        }
+        
+        let tweet = viewModel.tweets.value[indexPath.row]
+        
+        cell.configureTweet(with: tweet.author.displayName,
+                            username: tweet.author.username,
+                            tweetTextContent: tweet.tweetContent,
+                            avatarPath: tweet.author.avatarPath)
+        
+        cell.delegate = self
+        return cell
+    }
+}
+
+extension HomeViewController: TweetTableViewCellDelegate {
+    func tweetTableViewCellDidTapReply() {
+        print("Reply")
+    }
+    
+    func tweetTableViewCellDidTapRetweet() {
+        print("Retweet")
+    }
+    
+    func tweetTableViewCellDidTapLike() {
+        print("Like")
+    }
+    
+    func tweetTableViewCellDidTapShare() {
+        print("Share")
+    }
+}
