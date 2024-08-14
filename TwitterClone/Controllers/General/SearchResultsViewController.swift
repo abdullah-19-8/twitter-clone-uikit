@@ -12,7 +12,9 @@ import RxCocoa
 class SearchResultsViewController: UIViewController {
     
     private let disposeBag = DisposeBag()
-    private let usersSubject = BehaviorSubject<[TwitterUser]>(value: [])
+    
+    // Use BehaviorRelay to store the users list reactively
+    private let users = BehaviorRelay<[TwitterUser]>(value: [])
     
     private let searchResultsTableView: UITableView = {
         let table = UITableView()
@@ -26,42 +28,56 @@ class SearchResultsViewController: UIViewController {
         
         view.addSubview(searchResultsTableView)
         configureConstraints()
-        
-        setupBindings()
+        bindTableView()
     }
     
     func update(users: [TwitterUser]) {
-        usersSubject.onNext(users)
+        self.users.accept(users)
     }
     
-    private func setupBindings() {
-        // Bind the users array to the table view
-        usersSubject
-            .bind(to: searchResultsTableView.rx.items(cellIdentifier: UserTableViewCell.identifier, cellType: UserTableViewCell.self)) { index, user, cell in
+    private func bindTableView() {
+        // Bind users to the table view
+        users
+            .bind(to: searchResultsTableView.rx.items(cellIdentifier: UserTableViewCell.identifier, cellType: UserTableViewCell.self)) { row, user, cell in
                 cell.configure(with: user)
             }
             .disposed(by: disposeBag)
         
         // Handle row selection
-        searchResultsTableView.rx.modelSelected(TwitterUser.self)
+        searchResultsTableView.rx
+            .modelSelected(TwitterUser.self)
             .subscribe(onNext: { [weak self] user in
-                self?.handleUserSelection(user)
+                guard let self = self else { return }
+                let profileViewModel = ProfileViewModel(user: user)
+                let vc = ProfileViewController(viewModel: profileViewModel)
+                self.present(vc, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        // Deselect row after selection
+        searchResultsTableView.rx
+            .itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                self?.searchResultsTableView.deselectRow(at: indexPath, animated: true)
             })
             .disposed(by: disposeBag)
     }
     
     private func configureConstraints() {
-        NSLayoutConstraint.activate([
+        
+        let searchResultsTableViewConstraints = [
             searchResultsTableView.topAnchor.constraint(equalTo: view.topAnchor),
             searchResultsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchResultsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             searchResultsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+        ]
+        
+        NSLayoutConstraint.activate(searchResultsTableViewConstraints)
     }
-    
-    private func handleUserSelection(_ user: TwitterUser) {
-        let profileViewModel = ProfileViewModel(user: user)
-        let vc = ProfileViewController(viewModel: profileViewModel)
-        present(vc, animated: true)
+}
+
+extension SearchResultsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        90
     }
 }

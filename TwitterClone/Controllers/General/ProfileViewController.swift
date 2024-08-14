@@ -63,7 +63,7 @@ class ProfileViewController: UIViewController {
     private func bindViews() {
         // Bind tweets to table view
         viewModel.tweets
-            .bind(to: profileTableView.rx.items(cellIdentifier: TweetTableViewCell.identifier, cellType: TweetTableViewCell.self)) { [weak self] row, tweet, cell in
+            .bind(to: profileTableView.rx.items(cellIdentifier: TweetTableViewCell.identifier, cellType: TweetTableViewCell.self)) { row, tweet, cell in
                 cell.configureTweet(with: tweet.author.displayName,
                                     username: tweet.author.username,
                                     tweetTextContent: tweet.tweetContent,
@@ -84,6 +84,36 @@ class ProfileViewController: UIViewController {
                 self?.headerView.joinDateLabel.text = "Joined \(self?.viewModel.getFormattedDate(with: user.createdOn) ?? "")"
             })
             .disposed(by: disposeBag)
+        
+        viewModel.currentFollowingState
+                    .observe(on: MainScheduler.instance)
+                    .bind { [weak self] state in
+                        switch state {
+                        case .personal:
+                            self?.headerView.configureAsPersonal()
+                        case .userIsFollowed:
+                            self?.headerView.configureAsUnFollow()
+                        case .userIsUnFollowed:
+                            self?.headerView.configureFollow()
+                        }
+                    }
+                    .disposed(by: disposeBag)
+        
+        
+        headerView.followButtonActionRelay
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] state in
+                switch state {
+                case .personal:
+                    return
+                case .userIsFollowed:
+                    self?.viewModel.unFollow()
+                case .userIsUnFollowed:
+                    self?.viewModel.follow()
+                }
+            }
+            .disposed(by: disposeBag)
+        
         
         // Handle scroll view to toggle status bar visibility
         profileTableView.rx.contentOffset
