@@ -27,6 +27,7 @@ class SearchResultsViewController: UIViewController {
         super.viewDidLoad()
         
         view.addSubview(searchResultsTableView)
+        searchResultsTableView.delegate = self
         configureConstraints()
         bindTableView()
     }
@@ -77,7 +78,21 @@ class SearchResultsViewController: UIViewController {
 }
 
 extension SearchResultsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        90
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath)
+ -> CGFloat {
+        return 75 // Set cell height to 75
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerView = UIView()
+        footerView.backgroundColor
+ = .clear // Or any desired color
+        return footerView
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 10 // Add 10 points of spacing between cells
     }
 }
+

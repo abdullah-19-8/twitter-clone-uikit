@@ -165,7 +165,11 @@ class DatabaseManager {
     
     func collectionUsers(search query: String) -> Observable<[TwitterUser]> {
         return Observable.create { observer in
-            self.db.collection(self.usersPath).whereField("username", isEqualTo: query).getDocuments { snapshot, error in
+            let endQuery = query + "\u{f8ff}" // Create an upper bound for the query
+                    let queryReference = self.db.collection(self.usersPath)
+                        .whereField("username", isGreaterThanOrEqualTo: query)
+                        .whereField("username", isLessThanOrEqualTo: endQuery)
+            queryReference.getDocuments { snapshot, error in
                 if let error = error {
                     observer.onError(error)
                 } else if let snapshot = snapshot {

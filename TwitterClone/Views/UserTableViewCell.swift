@@ -60,7 +60,10 @@ class UserTableViewCell: UITableViewCell {
             displayNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
             usernameLabel.leadingAnchor.constraint(equalTo: displayNameLabel.trailingAnchor, constant: 10),
-            usernameLabel.centerYAnchor.constraint(equalTo: displayNameLabel.centerYAnchor)
+            usernameLabel.centerYAnchor.constraint(equalTo: displayNameLabel.centerYAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
+            contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
         ])
     }
     
