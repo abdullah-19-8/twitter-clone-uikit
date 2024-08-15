@@ -75,13 +75,37 @@ class ProfileViewController: UIViewController {
         viewModel.user
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] user in
-                self?.headerView.displayNameLabel.text = user.displayName
-                self?.headerView.usernameLabel.text = "@\(user.username)"
-                self?.headerView.userBioLabel.text = user.bio
-                self?.headerView.followingCountLabel.text = String(user.followingCount)
-                self?.headerView.followersCountLabel.text = String(user.followersCount)
-                self?.headerView.profileAvatarImageView.sd_setImage(with: URL(string: user.avatarPath))
-                self?.headerView.joinDateLabel.text = "Joined \(self?.viewModel.getFormattedDate(with: user.createdOn) ?? "")"
+                guard let self = self else { return }
+                print("user: \(user)")
+                self.headerView.displayNameLabel.text = user.displayName
+                self.headerView.usernameLabel.text = "@\(user.username)"
+                self.headerView.userBioLabel.text = user.bio
+                
+                // Fetch and set the following count
+                self.viewModel.fetchFollowers()
+                    .observe(on: MainScheduler.instance)
+                    .subscribe(onNext: { followers in
+                        self.headerView.followersCountLabel.text = String(followers.count)
+                    }, onError: { error in
+                        print("Error fetching followers: \(error)")
+                        self.headerView.followersCountLabel.text = "0"
+                    })
+                    .disposed(by: self.disposeBag)
+                self.viewModel.fetchFollowings()
+                    .observe(on: MainScheduler.instance)
+                    .subscribe(onNext: { followings in
+                        self.headerView.followingCountLabel.text = String(followings.count)
+                    }, onError: { error in
+                        print("Error fetching followings: \(error)")
+                        self.headerView.followingCountLabel.text = "0"
+                    })
+                    .disposed(by: self.disposeBag)
+
+                
+                self.headerView.followersCountLabel.text = String(user.followers.count)
+                self.headerView.followingCountLabel.text = String(user.followings.count)
+                self.headerView.profileAvatarImageView.sd_setImage(with: URL(string: user.avatarPath))
+                self.headerView.joinDateLabel.text = "Joined \(self.viewModel.getFormattedDate(with: user.createdOn))"
             })
             .disposed(by: disposeBag)
         

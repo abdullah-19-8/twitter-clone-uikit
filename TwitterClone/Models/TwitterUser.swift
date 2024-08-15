@@ -12,9 +12,9 @@ struct TwitterUser: Codable {
     let id: String
     var displayName: String = ""
     var username: String = ""
-    var followersCount: Int = 0
-    var followingCount: Int = 0
     var createdOn: Date = Date()
+    var followers: [Followers] = []
+    var followings: [Followings] = []
     var bio: String = ""
     var avatarPath: String = ""
     var isUserOnboarded: Bool = false
@@ -31,5 +31,13 @@ struct TwitterUser: Codable {
     init(id: String) {
         self.id = id
     }
+}
+
+struct Followers: Codable {
+    let userId: String?
+}
+
+struct Followings: Codable {
+    let userId: String?
 }
 

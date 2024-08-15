@@ -20,6 +20,7 @@ class DatabaseManager {
     let usersPath: String = "users"
     let tweetsPath: String = "tweets"
     let followingPath: String = "followings"
+    let followersPath: String = "followers"
     
     private let disposeBag = DisposeBag()
     
@@ -57,6 +58,54 @@ class DatabaseManager {
                     }
                 }
             }
+            return Disposables.create()
+        }
+    }
+    
+    func fetchFollowers(userId: String) -> Observable<[Followers]> {
+        return Observable.create { observer in
+            let followersRef = Firestore.firestore().collection(self.usersPath).document(userId).collection(self.followersPath)
+            followersRef.getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    observer.onError(error)
+                } else {
+                    var followers = [Followers]()
+                    if let documents = querySnapshot?.documents {
+                        for document in documents {
+                            let follower = Followers(userId: document.documentID)
+                            followers.append(follower)
+                        }
+                    }
+                    observer.onNext(followers)
+                    observer.onCompleted()
+                }
+            }
+            
+            // Return a disposable to clean up if necessary
+            return Disposables.create()
+        }
+    }
+
+    func fetchFollowings(userId: String) -> Observable<[Followings]> {
+        return Observable.create { observer in
+            let followingRef = Firestore.firestore().collection(self.usersPath).document(userId).collection(self.followingPath)
+            followingRef.getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    observer.onError(error)
+                } else {
+                    var followings = [Followings]()
+                    if let documents = querySnapshot?.documents {
+                        for document in documents {
+                            let following = Followings(userId: document.documentID)
+                            followings.append(following)
+                        }
+                    }
+                    observer.onNext(followings)
+                    observer.onCompleted()
+                }
+            }
+            
+            // Return a disposable to clean up if necessary
             return Disposables.create()
         }
     }
@@ -137,9 +186,10 @@ class DatabaseManager {
     
     func collectionFollowings(isFollower: String, following: String) -> Observable<Bool> {
         return Observable.create { observer in
-            self.db.collection(self.followingPath)
-                .whereField("follower", isEqualTo: isFollower)
-                .whereField("following", isEqualTo: following)
+            self.db.collection(self.usersPath)
+                .document(isFollower)
+                .collection(self.followingPath)
+                .whereField("userId", isEqualTo: following)
                 .getDocuments { snapshot, error in
                     if let error = error {
                         observer.onError(error)
@@ -152,12 +202,17 @@ class DatabaseManager {
         }
     }
     
-    func collectionFollowings(follower: String, following: String) -> Observable<Bool> {
+    func collectionFollowings(follower: String, add following: String) -> Observable<Bool> {
         return Observable.create { observer in
-            self.db.collection(self.followingPath).document().setData([
-                "follower": follower,
-                "following": following
-            ]) { error in
+            self.db.collection(self.usersPath)
+                .document(follower)
+                .collection(self.followingPath)
+                .document(following)
+                .setData([
+                    "userId": following,
+                    "createdOn": Date.now
+                ])
+            { error in
                 if let error = error {
                     observer.onError(error)
                 } else {
@@ -169,11 +224,62 @@ class DatabaseManager {
         }
     }
     
+    func collectionFollowings(add follower: String, following: String) -> Observable<Bool> {
+        return Observable.create { observer in
+            self.db.collection(self.usersPath)
+                .document(following)
+                .collection(self.followersPath)
+                .document(follower)
+                .setData([
+                    "userId": follower,
+                    "createdOn": Date.now
+                ])
+            { error in
+                if let error = error {
+                    observer.onError(error)
+                } else {
+                    observer.onNext(true)
+                    
+                    observer.onCompleted()
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
     func collectionFollowings(delete follower: String, following: String) -> Observable<Bool> {
         return Observable.create { observer in
-            self.db.collection(self.followingPath)
-                .whereField("follower", isEqualTo: follower)
-                .whereField("following", isEqualTo: following)
+            self.db.collection(self.usersPath)
+                .document(following)
+                .collection(self.followersPath)
+                .whereField("userId", isEqualTo: follower)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        observer.onError(error)
+                    } else if let document = snapshot?.documents.first {
+                        document.reference.delete { error in
+                            if let error = error {
+                                observer.onError(error)
+                            } else {
+                                observer.onNext(true)
+                                observer.onCompleted()
+                            }
+                        }
+                    } else {
+                        observer.onNext(false)
+                        observer.onCompleted()
+                    }
+                }
+            return Disposables.create()
+        }
+    }
+    
+    func collectionFollowings(follower: String, delete following: String) -> Observable<Bool> {
+        return Observable.create { observer in
+            self.db.collection(self.usersPath)
+                .document(follower)
+                .collection(self.followingPath)
+                .whereField("userId", isEqualTo: following)
                 .getDocuments { snapshot, error in
                     if let error = error {
                         observer.onError(error)
