@@ -34,9 +34,9 @@ final class HomeViewModel {
     }
     
     func fetchTweets() {
-        guard let id = user.value?.id else { return }
-        DatabaseManager.shared.collectionTweets(retreiveTweets: id)
+        DatabaseManager.shared.collectionTweets()
             .subscribe(onNext: { [weak self] retreivedTweets in
+                print("tweets: \(retreivedTweets)")
                 self?.tweets.accept(retreivedTweets)
             }, onError: { [weak self] error in
                 self?.error.accept(error.localizedDescription)

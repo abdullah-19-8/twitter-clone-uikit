@@ -141,24 +141,49 @@ class DatabaseManager {
             return Disposables.create()
         }
     }
-    
+
     func collectionTweets(retreiveTweets userID: String) -> Observable<[Tweet]> {
         return Observable.create { observer in
-            self.db.collection(self.tweetsPath).whereField("authorID", isEqualTo: userID).getDocuments { snapshot, error in
-                if let error = error {
-                    observer.onError(error)
-                } else if let snapshot = snapshot {
-                    do {
-                        let tweets = try snapshot.documents.map { document in
-                            try document.data(as: Tweet.self)
-                        }
-                        observer.onNext(tweets)
-                        observer.onCompleted()
-                    } catch {
+            self.db.collection(self.tweetsPath)
+                .whereField("authorID", isEqualTo: userID)
+                .getDocuments { snapshot, error in
+                    if let error = error {
                         observer.onError(error)
+                    } else if let snapshot = snapshot {
+                        do {
+                            let tweets = try snapshot.documents.map { document in
+                                try document.data(as: Tweet.self)
+                            }
+                            observer.onNext(tweets)
+                            observer.onCompleted()
+                        } catch {
+                            observer.onError(error)
+                        }
                     }
                 }
-            }
+            return Disposables.create()
+        }
+    }
+
+    
+    func collectionTweets() -> Observable<[Tweet]> {
+        return Observable.create { observer in
+            self.db.collection(self.tweetsPath)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        observer.onError(error)
+                    } else if let snapshot = snapshot {
+                        do {
+                            let tweets = try snapshot.documents.map { document in
+                                try document.data(as: Tweet.self)
+                            }
+                            observer.onNext(tweets)
+                            observer.onCompleted()
+                        } catch {
+                            observer.onError(error)
+                        }
+                    }
+                }
             return Disposables.create()
         }
     }
