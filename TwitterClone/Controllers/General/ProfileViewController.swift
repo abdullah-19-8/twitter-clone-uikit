@@ -127,16 +127,26 @@ class ProfileViewController: UIViewController {
         headerView.followButtonActionRelay
             .observe(on: MainScheduler.instance)
             .bind { [weak self] state in
+                guard let self = self else { return }
                 switch state {
                 case .personal:
                     return
                 case .userIsFollowed:
-                    self?.viewModel.unFollow()
+                    self.viewModel.unFollow()
+                    if let followersText = self.headerView.followersCountLabel.text,
+                       let followersCount = Int(followersText) {
+                        self.headerView.followersCountLabel.text = "\(followersCount - 1)"
+                    }
                 case .userIsUnFollowed:
-                    self?.viewModel.follow()
+                    self.viewModel.follow()
+                    if let followersText = self.headerView.followersCountLabel.text,
+                       let followersCount = Int(followersText) {
+                        self.headerView.followersCountLabel.text = "\(followersCount + 1)"
+                    }
                 }
             }
             .disposed(by: disposeBag)
+
         
         
         // Handle scroll view to toggle status bar visibility
